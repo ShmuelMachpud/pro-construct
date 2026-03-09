@@ -1,10 +1,18 @@
 import { useState } from "react";
-import { Box, Button, TextField, Typography, Paper, InputAdornment, IconButton } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Visibility, VisibilityOff, Construction } from "@mui/icons-material";
 import { login } from "../services/auth.service";
 
-const BG_IMAGE = "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1920&q=80";
+const BG_IMAGE = "/proconstruct.jpg";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -70,7 +78,15 @@ const LoginPage = () => {
           }}
         >
           {/* לוגו */}
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1, mb: 4 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 1,
+              mb: 4,
+            }}
+          >
             <Construction sx={{ color: "primary.main", fontSize: 36 }} />
             <Typography variant="h4" fontWeight="bold" color="white">
               Pro<span style={{ color: "#FF6B00" }}>Construct</span>
@@ -99,7 +115,10 @@ const LoginPage = () => {
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
@@ -108,7 +127,12 @@ const LoginPage = () => {
           />
 
           {error && (
-            <Typography color="error" textAlign="center" mt={1} fontSize="0.9rem">
+            <Typography
+              color="error"
+              textAlign="center"
+              mt={1}
+              fontSize="0.9rem"
+            >
               {error}
             </Typography>
           )}
