@@ -6,6 +6,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import PersonIcon from "@mui/icons-material/Person";
 import { getProjects } from "../services/project.service";
 import CreateProjectModal from "../components/CreateProjectModal";
+import { useAuth } from "../../global/hooks/useAuth";
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   planning: { label: "תכנון", color: "#757575" },
@@ -22,6 +23,7 @@ const typeLabels: Record<string, string> = {
 };
 
 const ProjectsPage = () => {
+  const { isContractor } = useAuth();
   const [projects, setProjects] = useState<any[]>([]);
   const [openModal, setOpenModal] = useState(false);
 
@@ -36,9 +38,11 @@ const ProjectsPage = () => {
         <Typography variant="h5" fontWeight="bold" color="white">
           פרויקטים
         </Typography>
-<Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpenModal(true)}>
-  פרויקט חדש
-</Button>
+{isContractor && (
+  <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpenModal(true)}>
+    פרויקט חדש
+  </Button>
+)}
       </Box>
 
       {/* כרטיסיות */}
@@ -128,11 +132,13 @@ const ProjectsPage = () => {
         ))}
       </Grid>
 
-      <CreateProjectModal
-  open={openModal}
-  onClose={() => setOpenModal(false)}
-  onCreated={() => getProjects().then(setProjects)}
-/>
+      {isContractor && (
+        <CreateProjectModal
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          onCreated={() => getProjects().then(setProjects)}
+        />
+      )}
     </Box>
   );
 };

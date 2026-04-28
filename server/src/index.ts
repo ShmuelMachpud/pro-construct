@@ -5,6 +5,7 @@ import { AppDataSource } from "./config/database";
 import { ENV } from "./config/environments";
 import projectRoutes from "./project/project.routes";
 import authRoutes from "./auth/auth.routes";
+import clientRoutes from "./client/client.routes";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/clients", clientRoutes);
 
 AppDataSource.initialize()
   .then(() => {

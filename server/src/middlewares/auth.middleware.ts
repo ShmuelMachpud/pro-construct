@@ -35,6 +35,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
 export const authorize = (...roles: UserRole[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
+      console.warn(`[403] ${req.method} ${req.originalUrl} — role "${req.user?.role}" not in [${roles.join(", ")}]`);
       res.status(403).json({ message: "Forbidden" });
       return;
     }
