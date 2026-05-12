@@ -1,11 +1,11 @@
-import { Project } from "../../entities/Project";
+import { Project } from "../model/project.entity";
 import { createProject, getProjectsByContractor, getProjectById } from "../dal/projects.dal";
 import { createClientService } from "../../clients/services/clients.service";
 import { CreateProjectDto } from "../types/projects.types";
 
 export { CreateProjectDto };
 
-export const createProjectService = async (dto: CreateProjectDto, contractorId: number): Promise<Project> => {
+export const createProjectService = async (dto: CreateProjectDto, contractorId: string): Promise<Project> => {
   let clientId = dto.clientId;
 
   if (!clientId && dto.newClient) {
@@ -30,11 +30,11 @@ export const createProjectService = async (dto: CreateProjectDto, contractorId: 
   });
 };
 
-export const getProjectsService = async (contractorId: number): Promise<Project[]> => {
+export const getProjectsService = async (contractorId: string): Promise<Project[]> => {
   return await getProjectsByContractor(contractorId);
 };
 
-export const getProjectByIdService = async (id: number, contractorId: number): Promise<Project> => {
+export const getProjectByIdService = async (id: number, contractorId: string): Promise<Project> => {
   const project = await getProjectById(id, contractorId);
   if (!project) {
     throw new Error("Project not found");

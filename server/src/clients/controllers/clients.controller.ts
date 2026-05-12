@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { AuthRequest } from "../../shared/middleware/auth.middleware";
+import { AuthRequest } from "../../middleware/auth.types";
 import {
   createClientService,
   getClientsService,
@@ -10,8 +10,7 @@ import {
 
 export const createClient = async (req: AuthRequest, res: Response) => {
   try {
-    const contractorId = req.user!.contractorId ?? req.user!.id;
-    const client = await createClientService(req.body, contractorId);
+    const client = await createClientService(req.body, req.user!.id);
     res.status(201).json(client);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
@@ -20,8 +19,7 @@ export const createClient = async (req: AuthRequest, res: Response) => {
 
 export const getClients = async (req: AuthRequest, res: Response) => {
   try {
-    const contractorId = req.user!.contractorId ?? req.user!.id;
-    const clients = await getClientsService(contractorId);
+    const clients = await getClientsService(req.user!.id);
     res.status(200).json(clients);
   } catch (error: any) {
     res.status(500).json({ message: error.message });
@@ -30,8 +28,7 @@ export const getClients = async (req: AuthRequest, res: Response) => {
 
 export const getClientById = async (req: AuthRequest, res: Response) => {
   try {
-    const contractorId = req.user!.contractorId ?? req.user!.id;
-    const client = await getClientByIdService(Number(req.params.id), contractorId);
+    const client = await getClientByIdService(Number(req.params.id), req.user!.id);
     res.status(200).json(client);
   } catch (error: any) {
     res.status(404).json({ message: error.message });
@@ -40,8 +37,7 @@ export const getClientById = async (req: AuthRequest, res: Response) => {
 
 export const updateClient = async (req: AuthRequest, res: Response) => {
   try {
-    const contractorId = req.user!.contractorId ?? req.user!.id;
-    const client = await updateClientService(Number(req.params.id), contractorId, req.body);
+    const client = await updateClientService(Number(req.params.id), req.user!.id, req.body);
     res.status(200).json(client);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
@@ -50,8 +46,7 @@ export const updateClient = async (req: AuthRequest, res: Response) => {
 
 export const deleteClient = async (req: AuthRequest, res: Response) => {
   try {
-    const contractorId = req.user!.contractorId ?? req.user!.id;
-    await deleteClientService(Number(req.params.id), contractorId);
+    await deleteClientService(Number(req.params.id), req.user!.id);
     res.status(204).send();
   } catch (error: any) {
     res.status(404).json({ message: error.message });

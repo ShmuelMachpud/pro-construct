@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { User } from "./User";
+import { User } from "../../auth/model/user.entity";
 
 export enum ClientType {
   PRIVATE = "private",
@@ -33,7 +33,7 @@ export class Client {
   notes: string;
 
   @Column()
-  contractorId: number;
+  contractorId: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: "contractorId" })

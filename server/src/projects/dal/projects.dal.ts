@@ -1,5 +1,5 @@
 import { AppDataSource } from "../../config/database";
-import { Project } from "../../entities/Project";
+import { Project } from "../model/project.entity";
 
 const projectRepository = AppDataSource.getRepository(Project);
 
@@ -8,7 +8,7 @@ export const createProject = async (data: Partial<Project>): Promise<Project> =>
   return await projectRepository.save(project);
 };
 
-export const getProjectsByContractor = async (contractorId: number): Promise<Project[]> => {
+export const getProjectsByContractor = async (contractorId: string): Promise<Project[]> => {
   return await projectRepository.find({
     where: { contractorId },
     relations: ["client", "siteManager"],
@@ -16,7 +16,7 @@ export const getProjectsByContractor = async (contractorId: number): Promise<Pro
   });
 };
 
-export const getProjectById = async (id: number, contractorId: number): Promise<Project | null> => {
+export const getProjectById = async (id: number, contractorId: string): Promise<Project | null> => {
   return await projectRepository.findOne({
     where: { id, contractorId },
     relations: ["client", "siteManager"],

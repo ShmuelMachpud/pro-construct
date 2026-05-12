@@ -33,15 +33,16 @@ Server requires a `.env` file with `PORT`, `DB_URL`, and `JWT_SECRET`.
 
 Uses a layered **routes → controller → service → DAL** pattern per feature module.
 
-- `entities/` — TypeORM entities: `User`, `Project`, `Client`, `Employee`, `Task`, `Expense`
-- `auth/` — Registration and login; returns JWT
-- `project/` — Project CRUD
-- `client/` — Client data access layer
-- `middlewares/` — `authenticate` (JWT validation) and `authorize` (role check)
-- `config/database.ts` — TypeORM PostgreSQL data source
+- `middleware/` — `authenticate` (JWT validation) and `authorize` (role check)
+- `auth/` — Registration, login, user approval; entity: `User`
+- `clients/` — Client CRUD; entity: `Client`
+- `projects/` — Project CRUD; entity: `Project`
+- `config/database.ts` — TypeORM PostgreSQL data source (entities: User, Client, Project)
 - `config/environments.ts` — Loads env vars
 
-**User roles**: `SUPER_ADMIN`, `CONTRACTOR`, `SITE_MANAGER`
+**User roles**: `ADMIN` (מנהל המערכת), `OPERATOR` (עובד מטעם המנהל), `CONTRACTOR` (קבלן — המשתמש בפועל)
+
+**Approval flow**: קבלן נרשם עם `isApproved: false`. לוגין חסום עד שמנהל/אופרטור מאשרים דרך `PATCH /api/auth/users/:id/approve`.
 
 **Auth flow**: `POST /api/auth/login` returns a JWT → client stores it in `localStorage` → sent as `Authorization: Bearer <token>` on every request → backend middleware validates and attaches the user to `req`.
 
@@ -60,8 +61,10 @@ Feature-based module structure:
 
 | Method | Path | Auth | Roles |
 |--------|------|------|-------|
-| POST | `/api/auth/register` | No | — |
+| POST | `/api/auth/register` | No | — (יוצר קבלן, ממתין לאישור) |
 | POST | `/api/auth/login` | No | — |
-| GET | `/api/projects` | Yes | CONTRACTOR, SITE_MANAGER |
-| GET | `/api/projects/:id` | Yes | CONTRACTOR, SITE_MANAGER |
+| GET | `/api/auth/pending` | Yes | ADMIN, OPERATOR |
+| PATCH | `/api/auth/users/:id/approve` | Yes | ADMIN, OPERATOR |
+| GET | `/api/projects` | Yes | CONTRACTOR, OPERATOR |
+| GET | `/api/projects/:id` | Yes | CONTRACTOR, OPERATOR |
 | POST | `/api/projects` | Yes | CONTRACTOR |

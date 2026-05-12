@@ -5,37 +5,48 @@ Express.js + TypeScript server.
 
 ## Server File Structure
 
-Every domain module lives under `server/<module>/` with this exact structure:
-
 ```
-server/
+src/
+├── middleware/
+│   ├── auth.middleware.ts          ← authenticate, authorize
+│   └── auth.types.ts               ← AuthPayload, AuthRequest
+├── config/
+│   ├── database.ts
+│   └── environments.ts
+├── auth/
+│   ├── model/
+│   │   └── user.entity.ts          ← User entity + UserRole enum
+│   ├── routes/
+│   ├── controllers/
+│   ├── services/
+│   ├── dal/
+│   ├── helpers/
+│   └── types/
 ├── clients/
-│   ├── routes/
-│   │   └── clients.router.ts
-│   ├── controllers/
-│   │   └── clients.controller.ts
-│   ├── services/
-│   │   └── clients.service.ts
-│   ├── dal/
-│   │   └── clients.dal.ts
-│   ├── helpers/
-│   │   └── clients.helpers.ts
-│   └── types/
-│       └── clients.types.ts
-├── projects/
+│   ├── model/
+│   │   └── client.entity.ts
 │   ├── routes/
 │   ├── controllers/
 │   ├── services/
 │   ├── dal/
 │   ├── helpers/
 │   └── types/
-└── ...
+└── projects/
+    ├── model/
+    │   └── project.entity.ts
+    ├── routes/
+    ├── controllers/
+    ├── services/
+    ├── dal/
+    ├── helpers/
+    └── types/
 ```
 
 ## Layer Responsibilities
 
 | Layer | File | Responsibility |
 |---|---|---|
+| `model/` | `<module>.entity.ts` | TypeORM entity + enums for this domain |
 | `routes/` | `<module>.router.ts` | Express Router, define endpoints, attach middleware |
 | `controllers/` | `<module>.controller.ts` | Parse req/res, call service, return response |
 | `services/` | `<module>.service.ts` | Business logic, orchestration between DAL calls |
@@ -45,7 +56,8 @@ server/
 
 ## Naming Conventions
 
-- File names: `<module>.<layer>.ts` — e.g. `clients.service.ts`, `projects.dal.ts`
+- Entity files: `<module>.entity.ts` — e.g. `user.entity.ts`, `client.entity.ts`
+- Other file names: `<module>.<layer>.ts` — e.g. `clients.service.ts`, `projects.dal.ts`
 - Routers: export a named `const <module>Router = Router()`
 - Controllers: named functions, not default export — e.g. `export const getClientById = ...`
 - Services / DAL: named exports only, no default exports
@@ -56,9 +68,10 @@ server/
 - **Never** call DAL directly from a controller — always go through the service layer
 - **Never** import from another module's `dal/` directly — go through that module's `service/`
 - Each layer imports only from the layer below it (routes → controllers → services → dal)
-- Shared types across modules go in `server/shared/types/`
-- Shared middleware goes in `server/shared/middleware/`
+- **Types only in types files** — interfaces and types must not be defined in middleware, service, controller, or DAL files. Place them in the module's `types/<module>.types.ts`, or for middleware-level types in `middleware/auth.types.ts`
+- Shared middleware lives in `src/middleware/` — not inside any module
+- Entity files (`model/`) may be imported by other modules that need the type (e.g. a relation)
 
 ## When Adding a New Module
 
-Always create all 6 subdirectories (`routes/`, `controllers/`, `services/`, `dal/`, `helpers/`, `types/`) even if some are initially empty — keep the structure consistent.
+Always create all 7 subdirectories (`model/`, `routes/`, `controllers/`, `services/`, `dal/`, `helpers/`, `types/`) even if some are initially empty — keep the structure consistent.
