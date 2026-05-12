@@ -1,35 +1,15 @@
-import { Project } from "../entities/Project";
-import { createProject, getProjectsByContractor, getProjectById } from "./project.dal";
-import { createClient, getClientById } from "../client/client.dal";
+import { Project } from "../../entities/Project";
+import { createProject, getProjectsByContractor, getProjectById } from "../dal/projects.dal";
+import { createClientService } from "../../clients/services/clients.service";
+import { CreateProjectDto } from "../types/projects.types";
 
-export interface CreateProjectDto {
-  name: string;
-  type: string;
-  city: string;
-  address?: string;
-  budget?: number;
-  permitStatus?: string;
-  siteManagerId?: number;
-  clientId?: number;
-  newClient?: {
-    name: string;
-    type: string;
-    phone: string;
-    email?: string;
-    address?: string;
-    idNumber?: string;
-    notes?: string;
-  };
-}
+export { CreateProjectDto };
 
 export const createProjectService = async (dto: CreateProjectDto, contractorId: number): Promise<Project> => {
   let clientId = dto.clientId;
 
   if (!clientId && dto.newClient) {
-    const client = await createClient({
-      ...dto.newClient,
-      contractorId,
-    } as any);
+    const client = await createClientService(dto.newClient, contractorId);
     clientId = client.id;
   }
 

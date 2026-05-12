@@ -3,16 +3,18 @@ import express from "express";
 import cors from "cors";
 import { AppDataSource } from "./config/database";
 import { ENV } from "./config/environments";
-import projectRoutes from "./project/project.routes";
-import authRoutes from "./auth/auth.routes";
+import { projectsRouter } from "./projects/routes/projects.router";
+import { authRouter } from "./auth/routes/auth.router";
+import { clientsRouter } from "./clients/routes/clients.router";
 
 const app = express();
 
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
 
-app.use("/api/auth", authRoutes);
-app.use("/api/projects", projectRoutes);
+app.use("/api/auth", authRouter);
+app.use("/api/projects", projectsRouter);
+app.use("/api/clients", clientsRouter);
 
 AppDataSource.initialize()
   .then(() => {

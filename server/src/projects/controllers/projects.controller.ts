@@ -1,6 +1,6 @@
 import { Response } from "express";
-import { AuthRequest } from "../middlewares/auth.middleware";
-import { createProjectService, getProjectsService, getProjectByIdService } from "./project.service";
+import { AuthRequest } from "../../shared/middleware/auth.middleware";
+import { createProjectService, getProjectsService, getProjectByIdService } from "../services/projects.service";
 
 export const createProject = async (req: AuthRequest, res: Response) => {
   try {

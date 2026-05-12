@@ -1,5 +1,5 @@
-import { AppDataSource } from "../config/database";
-import { Client } from "../entities/Client";
+import { AppDataSource } from "../../config/database";
+import { Client } from "../../entities/Client";
 
 const clientRepository = AppDataSource.getRepository(Client);
 
@@ -19,4 +19,14 @@ export const getClientById = async (id: number, contractorId: number): Promise<C
   return await clientRepository.findOne({
     where: { id, contractorId },
   });
+};
+
+export const updateClient = async (id: number, contractorId: number, data: Partial<Client>): Promise<Client | null> => {
+  await clientRepository.update({ id, contractorId }, data);
+  return await clientRepository.findOne({ where: { id, contractorId } });
+};
+
+export const deleteClient = async (id: number, contractorId: number): Promise<boolean> => {
+  const result = await clientRepository.delete({ id, contractorId });
+  return (result.affected ?? 0) > 0;
 };

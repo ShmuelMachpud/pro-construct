@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { ENV } from "../config/environments";
-import { UserRole } from "../entities/User";
+import { ENV } from "../../config/environments";
+import { UserRole } from "../../entities/User";
 
 export interface AuthPayload {
   id: number;
@@ -35,6 +35,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
 export const authorize = (...roles: UserRole[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
+      console.warn(`[403] ${req.method} ${req.originalUrl} — role "${req.user?.role}" not in [${roles.join(", ")}]`);
       res.status(403).json({ message: "Forbidden" });
       return;
     }
