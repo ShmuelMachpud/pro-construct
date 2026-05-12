@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { User } from "./User";
-import { Client } from "./Client";
+import { User } from "../../auth/model/user.entity";
+import { Client } from "../../clients/model/client.entity";
 
 export enum ProjectType {
   NEW_CONSTRUCTION = "new_construction",
@@ -50,7 +50,7 @@ export class Project {
   permitStatus: PermitStatus;
 
   @Column()
-  contractorId: number;
+  contractorId: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: "contractorId" })
@@ -64,7 +64,7 @@ export class Project {
   client: Client;
 
   @Column({ nullable: true })
-  siteManagerId: number;
+  siteManagerId: string;
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: "siteManagerId" })

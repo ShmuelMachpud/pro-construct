@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { createProject, getProjects, getProjectById } from "../controllers/projects.controller";
-import { authenticate, authorize } from "../../shared/middleware/auth.middleware";
-import { UserRole } from "../../entities/User";
+import { authenticate, authorize } from "../../middleware/auth.middleware";
+import { UserRole } from "../../auth/model/user.entity";
 
 export const projectsRouter = Router();
 
 projectsRouter.use(authenticate);
 
-projectsRouter.get("/", authorize(UserRole.CONTRACTOR, UserRole.SITE_MANAGER), getProjects);
-projectsRouter.get("/:id", authorize(UserRole.CONTRACTOR, UserRole.SITE_MANAGER), getProjectById);
+projectsRouter.get("/", authorize(UserRole.CONTRACTOR, UserRole.OPERATOR), getProjects);
+projectsRouter.get("/:id", authorize(UserRole.CONTRACTOR, UserRole.OPERATOR), getProjectById);
 projectsRouter.post("/", authorize(UserRole.CONTRACTOR), createProject);

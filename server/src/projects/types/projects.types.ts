@@ -5,7 +5,7 @@ export interface CreateProjectDto {
   address?: string;
   budget?: number;
   permitStatus?: string;
-  siteManagerId?: number;
+  siteManagerId?: string;
   clientId?: number;
   newClient?: {
     name: string;
