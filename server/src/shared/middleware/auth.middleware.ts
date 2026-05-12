@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { ENV } from "../config/environments";
-import { UserRole } from "../entities/User";
+import { ENV } from "../../config/environments";
+import { UserRole } from "../../entities/User";
 
 export interface AuthPayload {
   id: number;

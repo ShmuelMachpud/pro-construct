@@ -1,21 +1,14 @@
-import { Client } from "../entities/Client";
+import { Client } from "../../entities/Client";
 import {
   createClient,
   getClientsByContractor,
   getClientById,
   updateClient,
   deleteClient,
-} from "./client.dal";
+} from "../dal/clients.dal";
+import { CreateClientDto } from "../types/clients.types";
 
-export interface CreateClientDto {
-  name: string;
-  type: string;
-  phone: string;
-  email?: string;
-  address?: string;
-  idNumber?: string;
-  notes?: string;
-}
+export { CreateClientDto };
 
 export const createClientService = async (dto: CreateClientDto, contractorId: number): Promise<Client> => {
   return await createClient({ ...dto, contractorId } as any);

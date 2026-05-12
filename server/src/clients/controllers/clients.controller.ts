@@ -1,12 +1,12 @@
 import { Response } from "express";
-import { AuthRequest } from "../middlewares/auth.middleware";
+import { AuthRequest } from "../../shared/middleware/auth.middleware";
 import {
   createClientService,
   getClientsService,
   getClientByIdService,
   updateClientService,
   deleteClientService,
-} from "./client.service";
+} from "../services/clients.service";
 
 export const createClient = async (req: AuthRequest, res: Response) => {
   try {

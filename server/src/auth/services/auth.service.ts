@@ -1,21 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { ENV } from "../config/environments";
-import { UserRole } from "../entities/User";
-import { findUserByEmail, createUser } from "./auth.dal";
+import { ENV } from "../../config/environments";
+import { findUserByEmail, createUser } from "../dal/auth.dal";
+import { RegisterDto, LoginDto } from "../types/auth.types";
 
-export interface RegisterDto {
-  name: string;
-  email: string;
-  password: string;
-  role: UserRole;
-  contractorId?: number;
-}
-
-export interface LoginDto {
-  email: string;
-  password: string;
-}
+export { RegisterDto, LoginDto };
 
 export const registerService = async (dto: RegisterDto) => {
   const existing = await findUserByEmail(dto.email);
