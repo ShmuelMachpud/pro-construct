@@ -7,15 +7,24 @@ Express.js + TypeScript server.
 
 ```
 src/
+├── index.ts                            ← app bootstrap, middleware order
+├── routes/
+│   └── index.ts                        ← central router: mounts module routers + 404 catch-all
 ├── middleware/
-│   ├── auth.middleware.ts          ← authenticate, authorize
-│   └── auth.types.ts               ← AuthPayload, AuthRequest
+│   ├── auth.middleware.ts              ← authenticate, authorize
+│   ├── auth.types.ts                   ← AuthPayload, AuthRequest
+│   ├── cors.middleware.ts              ← CORS with ALLOWED_ORIGINS allowlist
+│   └── handleServerError.middleware.ts ← global error-handler (4-arg express middleware)
+├── utils/
+│   ├── logger.ts                       ← colored logger: info / warn / error / debug
+│   ├── customError.ts                  ← CustomError class (message + status)
+│   └── handleError.ts                  ← shared catch-block helper for controllers
 ├── config/
 │   ├── database.ts
-│   └── environments.ts
+│   └── environments.ts                 ← ENV.PORT, DB_URL, JWT_SECRET, ALLOWED_ORIGINS
 ├── auth/
 │   ├── model/
-│   │   └── user.entity.ts          ← User entity + UserRole enum
+│   │   └── user.entity.ts              ← User entity + UserRole enum
 │   ├── routes/
 │   ├── controllers/
 │   ├── services/
@@ -71,7 +80,106 @@ src/
 - **Types only in types files** — interfaces and types must not be defined in middleware, service, controller, or DAL files. Place them in the module's `types/<module>.types.ts`, or for middleware-level types in `middleware/auth.types.ts`
 - Shared middleware lives in `src/middleware/` — not inside any module
 - Entity files (`model/`) may be imported by other modules that need the type (e.g. a relation)
+- **Single-statement `if` blocks must be written on one line without braces** — when an `if` contains exactly one statement (typically a guard clause that `throw`s a `CustomError`), drop the braces and write it inline. Example: `if (!user) throw new CustomError("User not found", 404);` — not a multi-line block.
 
 ## When Adding a New Module
 
 Always create all 7 subdirectories (`model/`, `routes/`, `controllers/`, `services/`, `dal/`, `helpers/`, `types/`) even if some are initially empty — keep the structure consistent.
+
+After creating the module's router, **register it in `src/routes/index.ts`** under the appropriate path — module routers must not be mounted directly in `src/index.ts`.
+
+## Error Handling
+
+Three pieces work together:
+
+1. **`CustomError`** ([`utils/customError.ts`](src/utils/customError.ts)) — `new CustomError(message, status)`. Use this for every expected error a service can produce. Pick the right HTTP status (404 not found, 400 bad input, 401 unauthorized, 403 forbidden, 409 conflict, etc.).
+2. **`handleError(err, res)`** ([`utils/handleError.ts`](src/utils/handleError.ts)) — called from every `catch` block in controllers. If `err` is a `CustomError`, sends its `status` + `message`. Otherwise logs the real message and returns a generic 500 to the client.
+3. **`handleServerError`** ([`middleware/handleServerError.middleware.ts`](src/middleware/handleServerError.middleware.ts)) — registered last in `index.ts`. Safety net for anything that escapes a controller (uncaught throws, errors from middleware). Same logic as `handleError` but at the express-middleware level.
+
+### Service convention
+
+Every service function must be wrapped in `try / catch` that re-throws as `Promise.reject`:
+
+```ts
+export const getProjectByIdService = async (id: number, contractorId: string): Promise<Project> => {
+  try {
+    const project = await getProjectById(id, contractorId);
+    if (!project) throw new CustomError("Project not found", 404);
+    return project;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+```
+
+Throw `CustomError` directly inside the `try` — it propagates through the `catch` unchanged.
+
+### Controller convention
+
+Every controller method uses `handleError` in its catch — never inline `res.status(...).json(...)` for errors:
+
+```ts
+export const getProjectById = async (req: AuthRequest, res: Response) => {
+  try {
+    const project = await getProjectByIdService(Number(req.params.id), req.user!.id);
+    res.status(200).json(project);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
+```
+
+The status code now comes from the `CustomError` thrown by the service — controllers do not hard-code error statuses.
+
+## Routing
+
+- All module routers (`authRouter`, `clientsRouter`, `projectsRouter`, etc.) are mounted in the central router at [`src/routes/index.ts`](src/routes/index.ts), not in `index.ts`.
+- `index.ts` mounts the central router once under `/api`:
+  ```ts
+  app.use("/api", router);
+  ```
+- The central router ends with a catch-all that returns 404 via `handleError`:
+  ```ts
+  router.use((req, res) =>
+    handleError(new CustomError(`Route not found: ${req.method} ${req.originalUrl}`, 404), res)
+  );
+  ```
+  This must remain the last `router.use(...)` in the file.
+
+## Logger
+
+[`src/utils/logger.ts`](src/utils/logger.ts) — small colored logger. Always use it instead of `console.*`. Format: `[TAG] <ISO date> <message>`.
+
+- `logger.info(message)` — green tag
+- `logger.warn(message)` — yellow tag
+- `logger.error(message)` — red tag
+- `logger.debug(message)` — cyan tag
+
+`message` must be a `string`. To include an `Error` object or other value, format it explicitly (template literal, `err.message`, `String(value)`).
+
+`handleError` and `handleServerError` already log through this logger — do not log the same error a second time at the call site.
+
+## CORS
+
+[`src/middleware/cors.middleware.ts`](src/middleware/cors.middleware.ts) reads the allowlist from `ENV.ALLOWED_ORIGINS`. Only requests whose `Origin` header is present **and** in the list are allowed — bare `curl`/Postman requests (no `Origin`) are also rejected.
+
+To allow a new origin, add it to `.env`:
+```
+ALLOWED_ORIGINS=http://localhost:5173,https://app.example.com
+```
+Comma-separated; whitespace around each entry is trimmed.
+
+## Cross-Cutting Utilities
+
+Truly cross-cutting helpers (not specific to one module) live in [`src/utils/`](src/utils/) — `logger`, `customError`, `handleError`. Per-module helpers still go in `<module>/helpers/`.
+
+## Middleware Order in `index.ts`
+
+The order matters. Keep it as:
+
+```ts
+app.use(corsMiddleware);           // before any route
+app.use(express.json());           // body parsing
+app.use("/api", router);           // all module routes (incl. /api/* 404)
+app.use(handleServerError);        // last — global error safety net
+```

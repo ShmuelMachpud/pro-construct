@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { ENV } from "../config/environments";
 import { AuthPayload, AuthRequest } from "./auth.types";
 import { UserRole } from "../auth/model/user.entity";
+import { logger } from "../utils/logger";
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;    
@@ -26,7 +27,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
 export const authorize = (...roles: UserRole[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
-      console.warn(`[403] ${req.method} ${req.originalUrl} — role "${req.user?.role}" not in [${roles.join(", ")}]`);
+      logger.warn(`[403] ${req.method} ${req.originalUrl} — role "${req.user?.role}" not in [${roles.join(", ")}]`);
       res.status(403).json({ message: "Forbidden" });
       return;
     }

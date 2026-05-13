@@ -1,29 +1,28 @@
 import "reflect-metadata";
 import express from "express";
-import cors from "cors";
 import { AppDataSource } from "./config/database";
 import { ENV } from "./config/environments";
-import { projectsRouter } from "./projects/routes/projects.router";
-import { authRouter } from "./auth/routes/auth.router";
-import { clientsRouter } from "./clients/routes/clients.router";
+import { router } from "./routes";
+import { logger } from "./utils/logger";
+import { handleServerError } from "./middleware/handleServerError.middleware";
+import { corsMiddleware } from "./middleware/cors.middleware";
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(corsMiddleware);
 app.use(express.json());
 
-app.use("/api/auth", authRouter);
-app.use("/api/projects", projectsRouter);
-app.use("/api/clients", clientsRouter);
+app.use("/api", router);
 
 AppDataSource.initialize()
   .then(() => {
-    console.log("Database connected successfully");
+    logger.info("Database connected successfully");
     app.listen(ENV.PORT, () => {
-      console.log(`Server running on port ${ENV.PORT}`);
+      logger.info(`Server running on port ${ENV.PORT}`);
     });
   })
   .catch((error) => {
-    console.error("Database connection failed:", error);
+    logger.error(`Database connection failed: ${error?.message ?? error}`);
     process.exit(1);
   });
+app.use(handleServerError);
