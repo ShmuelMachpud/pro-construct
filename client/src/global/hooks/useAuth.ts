@@ -1,11 +1,10 @@
 import { useMemo } from "react";
 
-export type UserRole = "contractor" | "site_manager" | "super_admin";
+export type UserRole = "admin" | "operator" | "contractor";
 
 interface AuthPayload {
   id: number;
   role: UserRole;
-  contractorId: number | null;
 }
 
 const decodeToken = (token: string): AuthPayload | null => {
@@ -25,8 +24,9 @@ export const useAuth = () => {
     return decodeToken(token);
   }, [token]);
 
-  const isContractor = user?.role === "contractor";
-  const isSiteManager = user?.role === "site_manager";
-
-  return { user, isContractor, isSiteManager };
+  return {
+    user,
+    isAdmin: user?.role === "admin",
+    isContractor: user?.role === "contractor",
+  };
 };
