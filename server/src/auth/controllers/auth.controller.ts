@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { registerService, loginService, approveUserService, getPendingContractorsService } from "../services/auth.service";
+import { registerService, loginService, approveUserService, getPendingContractorsService, getAllUsersService } from "../services/auth.service";
 import { AuthRequest } from "../../middleware/auth.types";
 import { handleError } from "../../utils/handleError";
 
@@ -33,6 +33,15 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
 export const getPendingContractors = async (_req: AuthRequest, res: Response) => {
   try {
     const users = await getPendingContractorsService();
+    res.status(200).json(users);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
+
+export const getAllUsers = async (_req: AuthRequest, res: Response) => {
+  try {
+    const users = await getAllUsersService();
     res.status(200).json(users);
   } catch (error) {
     handleError(error, res);

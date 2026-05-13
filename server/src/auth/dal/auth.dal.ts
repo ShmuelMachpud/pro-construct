@@ -24,3 +24,7 @@ export const setUserApproved = async (id: string): Promise<User> => {
 export const findPendingContractors = async (): Promise<User[]> => {
   return await userRepository.find({ where: { isApproved: false } });
 };
+
+export const findAllUsers = async (): Promise<User[]> => {
+  return await userRepository.find({ order: { createdAt: "DESC" } });
+};

@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { ENV } from "../../config/environments";
-import { findUserByEmail, findUserById, createUser, setUserApproved, findPendingContractors } from "../dal/auth.dal";
+import { findUserByEmail, findUserById, createUser, setUserApproved, findPendingContractors, findAllUsers } from "../dal/auth.dal";
 import { RegisterDto, LoginDto } from "../types/auth.types";
 import { UserRole } from "../model/user.entity";
 import { CustomError } from "../../utils/customError";
@@ -70,6 +70,15 @@ export const approveUserService = async (userId: string) => {
 export const getPendingContractorsService = async () => {
   try {
     const users = await findPendingContractors();
+    return users.map(({ password, ...u }) => u);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+export const getAllUsersService = async () => {
+  try {
+    const users = await findAllUsers();
     return users.map(({ password, ...u }) => u);
   } catch (error) {
     return Promise.reject(error);
