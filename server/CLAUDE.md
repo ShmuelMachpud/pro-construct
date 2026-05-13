@@ -14,6 +14,7 @@ src/
 │   ├── auth.middleware.ts              ← authenticate, authorize
 │   ├── auth.types.ts                   ← AuthPayload, AuthRequest
 │   ├── cors.middleware.ts              ← CORS with ALLOWED_ORIGINS allowlist
+│   ├── requestLogger.middleware.ts     ← logs every incoming request (method, url, status, duration)
 │   └── handleServerError.middleware.ts ← global error-handler (4-arg express middleware)
 ├── utils/
 │   ├── logger.ts                       ← colored logger: info / warn / error / debug
@@ -179,6 +180,7 @@ The order matters. Keep it as:
 
 ```ts
 app.use(corsMiddleware);           // before any route
+app.use(requestLogger);            // log every incoming request (after CORS so blocked origins aren't logged)
 app.use(express.json());           // body parsing
 app.use("/api", router);           // all module routes (incl. /api/* 404)
 app.use(handleServerError);        // last — global error safety net

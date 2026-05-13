@@ -42,7 +42,7 @@ Uses a layered **routes → controller → service → DAL** pattern per feature
 
 **User roles**: `ADMIN` (מנהל המערכת), `OPERATOR` (עובד מטעם המנהל), `CONTRACTOR` (קבלן — המשתמש בפועל)
 
-**Approval flow**: קבלן נרשם עם `isApproved: false`. לוגין חסום עד שמנהל/אופרטור מאשרים דרך `PATCH /api/auth/users/:id/approve`.
+**Approval flow**: קבלן נרשם עם `isApproved: false`. לוגין חסום עד שמנהל (ADMIN בלבד) מאשר דרך `PATCH /api/auth/users/:id/approve`.
 
 **Auth flow**: `POST /api/auth/login` returns a JWT → client stores it in `localStorage` → sent as `Authorization: Bearer <token>` on every request → backend middleware validates and attaches the user to `req`.
 
@@ -64,7 +64,7 @@ Feature-based module structure:
 | POST | `/api/auth/register` | No | — (יוצר קבלן, ממתין לאישור) |
 | POST | `/api/auth/login` | No | — |
 | GET | `/api/auth/pending` | Yes | ADMIN, OPERATOR |
-| PATCH | `/api/auth/users/:id/approve` | Yes | ADMIN, OPERATOR |
+| PATCH | `/api/auth/users/:id/approve` | Yes | ADMIN |
 | GET | `/api/projects` | Yes | CONTRACTOR, OPERATOR |
 | GET | `/api/projects/:id` | Yes | CONTRACTOR, OPERATOR |
 | POST | `/api/projects` | Yes | CONTRACTOR |
