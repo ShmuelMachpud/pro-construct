@@ -1,10 +1,12 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RootRedirect from "./components/RootRedirect";
 import ProjectsPage from "../projects/pages/ProjectsPage";
 import ClientsPage from "../clients/pages/ClientsPage";
 import LoginPage from "../auth/pages/LoginPage";
 import RegisterPage from "../auth/pages/RegisterPage";
+import UsersPage from "../users/pages/UsersPage";
 
 export const router = createBrowserRouter([
   {
@@ -23,18 +25,19 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
+      { index: true, element: <RootRedirect /> },
       {
-        path: "/",
-        element: <div>Home</div>,
+        element: (
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <Outlet />
+          </ProtectedRoute>
+        ),
+        children: [
+          { path: "users", element: <UsersPage /> },
+        ],
       },
-      {
-        path: "/projects",
-        element: <ProjectsPage />,
-      },
-      {
-        path: "/clients",
-        element: <ClientsPage />,
-      },
+      { path: "projects", element: <ProjectsPage /> },
+      { path: "clients", element: <ClientsPage /> },
     ],
   },
 ]);

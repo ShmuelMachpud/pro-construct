@@ -1,12 +1,17 @@
 import type { JSX } from "react";
 import { Navigate } from "react-router-dom";
+import { useAuth, type UserRole } from "../hooks/useAuth";
 
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const token = localStorage.getItem("token");
+interface ProtectedRouteProps {
+  children: JSX.Element;
+  allowedRoles?: UserRole[];
+}
 
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
+const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
+  const { user } = useAuth();
+
+  if (!user) return <Navigate to="/login" replace />;
+  if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/" replace />;
 
   return children;
 };
