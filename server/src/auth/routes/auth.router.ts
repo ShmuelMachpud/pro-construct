@@ -9,4 +9,4 @@ authRouter.post("/register", register);
 authRouter.post("/login", login);
 
 authRouter.get("/pending", authenticate, authorize(UserRole.ADMIN, UserRole.OPERATOR), getPendingContractors);
-authRouter.patch("/users/:id/approve", authenticate, authorize(UserRole.ADMIN, UserRole.OPERATOR), approveUser);
+authRouter.patch("/users/:id/approve", authenticate, authorize(UserRole.ADMIN), approveUser);

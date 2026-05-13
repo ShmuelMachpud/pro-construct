@@ -6,10 +6,12 @@ import { router } from "./routes";
 import { logger } from "./utils/logger";
 import { handleServerError } from "./middleware/handleServerError.middleware";
 import { corsMiddleware } from "./middleware/cors.middleware";
+import { requestLogger } from "./middleware/requestLogger.middleware";
 
 const app = express();
 
 app.use(corsMiddleware);
+app.use(requestLogger);
 app.use(express.json());
 
 app.use("/api", router);
