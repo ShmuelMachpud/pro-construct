@@ -4,11 +4,16 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ProjectsPage from "../projects/pages/ProjectsPage";
 import ClientsPage from "../clients/pages/ClientsPage";
 import LoginPage from "../auth/pages/LoginPage";
+import RegisterPage from "../auth/pages/RegisterPage";
 
 export const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
   },
   {
     path: "/",

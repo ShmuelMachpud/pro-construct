@@ -48,14 +48,59 @@ Uses a layered **routes → controller → service → DAL** pattern per feature
 
 ### Frontend (`/client/src`)
 
-Feature-based module structure:
+Feature-based module structure. Each module contains:
 
-- `auth/` — Login page and auth service
-- `projects/` — Project list page and creation components
-- `global/components/` — `Layout`, `Header`, `Sidebar`, `ProtectedRoute`
-- `global/services/` — Axios instance with JWT interceptors (reads token from localStorage)
-- `global/router.tsx` — React Router v7 setup; wraps private routes in `ProtectedRoute`
-- `global/theme.ts` — Material-UI v7 theme with RTL support (stylis-plugin-rtl)
+```
+src/
+├── global/
+│   ├── components/       ← reusable generic components (Form, Table, Page, etc.)
+│   ├── hooks/            ← reusable hooks (useAuth, ...)
+│   ├── services/         ← axios instance with JWT interceptors
+│   ├── router.tsx        ← React Router v7 setup; wraps private routes in ProtectedRoute
+│   └── theme.ts          ← Material-UI v7 theme with RTL (stylis-plugin-rtl)
+├── auth/
+│   ├── pages/            ← page components (one root component per page)
+│   ├── components/       ← module-specific components used by the pages
+│   ├── hooks/            ← data & logic hooks for this module
+│   └── services/         ← API calls (functions only, no state)
+├── clients/
+│   ├── pages/
+│   ├── components/
+│   ├── hooks/
+│   ├── services/
+│   └── types/
+└── projects/
+    ├── pages/
+    ├── components/
+    ├── hooks/
+    ├── services/
+    └── types/
+```
+
+## Frontend Conventions
+
+### 1 — Component responsibility (Single Responsibility)
+
+Every component does **one thing only**. A page component is the single root component for that route — it composes other components but contains no logic of its own. Business logic, data fetching, normalization, and service calls belong exclusively in hooks.
+
+```
+LoginPage           ← renders the page layout, delegates to LoginForm
+  └── LoginForm     ← renders the form UI, calls useLogin hook
+        └── useLogin  ← owns the logic: calls auth service, handles errors, navigates
+```
+
+### 2 — Generic reusable components live in `global/components/`
+
+Components that may be used across more than one module (e.g. `<AppForm>`, `<AppTable>`, `<AppPage>`, `<AppModal>`) must be generic — no business-domain props — and placed in `src/global/components/`. Module-specific components stay inside `<module>/components/`.
+
+### 3 — Components never call services or contain logic
+
+Page, tile, card, table, and form **component files must not**:
+- import or call service functions directly
+- contain `useState` / `useEffect` for data fetching
+- perform data normalization or transformation
+
+All of the above belongs in a **hook** (`<module>/hooks/use<Feature>.ts`). The component receives data and callbacks as props (or calls the hook at the top level and passes results down). The rule: if you need to remove a `console.log`, open the hook — not the component.
 
 ### API Endpoints
 

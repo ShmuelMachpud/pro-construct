@@ -1,9 +1,9 @@
 import { Box } from "@mui/material";
-import LoginForm from "../components/LoginForm";
+import RegisterForm from "../components/RegisterForm";
 
 const BG_IMAGE = "/proconstruct.jpg";
 
-const LoginPage = () => {
+const RegisterPage = () => {
   return (
     <Box
       sx={{
@@ -26,10 +26,10 @@ const LoginPage = () => {
           width: "100%",
         }}
       >
-        <LoginForm />
+        <RegisterForm />
       </Box>
     </Box>
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
