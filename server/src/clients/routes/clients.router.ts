@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { createClient, getClients, getClientById, updateClient, deleteClient } from "../controllers/clients.controller";
 import { authenticate, authorize } from "../../middleware/auth.middleware";
-import { UserRole } from "../../auth/model/user.entity";
+import { UserRole } from "../../users/model/user.entity";
 
 export const clientsRouter = Router();
 

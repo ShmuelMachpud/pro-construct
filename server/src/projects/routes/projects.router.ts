@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { createProject, getProjects, getProjectById } from "../controllers/projects.controller";
 import { authenticate, authorize } from "../../middleware/auth.middleware";
-import { UserRole } from "../../auth/model/user.entity";
+import { UserRole } from "../../users/model/user.entity";
 
 export const projectsRouter = Router();
 

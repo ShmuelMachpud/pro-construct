@@ -34,15 +34,19 @@ Server requires a `.env` file with `PORT`, `DB_URL`, and `JWT_SECRET`.
 Uses a layered **routes → controller → service → DAL** pattern per feature module.
 
 - `middleware/` — `authenticate` (JWT validation) and `authorize` (role check)
-- `auth/` — Registration, login, user approval; entity: `User`
+- `auth/` — Registration and login only; DAL imports `User` from `users/model/`
+- `users/` — User management: listing, contractor approval; entity: `User` (includes UserRole + SubscriptionStatus enums)
 - `clients/` — Client CRUD; entity: `Client`
 - `projects/` — Project CRUD; entity: `Project`
+- `billing/` — Subscription management and payment history (planned; entity: `PaymentHistory`)
 - `config/database.ts` — TypeORM PostgreSQL data source (entities: User, Client, Project)
 - `config/environments.ts` — Loads env vars
 
 **User roles**: `ADMIN` (מנהל המערכת), `OPERATOR` (עובד מטעם המנהל), `CONTRACTOR` (קבלן — המשתמש בפועל)
 
-**Approval flow**: קבלן נרשם עם `isApproved: false`. לוגין חסום עד שמנהל (ADMIN בלבד) מאשר דרך `PATCH /api/auth/users/:id/approve`.
+**Approval flow**: קבלן נרשם עם `isApproved: false`. לוגין חסום עד שמנהל (ADMIN בלבד) מאשר דרך `PATCH /api/users/:id/approve`.
+
+**Subscription flow**: קבלן בוחר תוכנית (`monthly` / `annual`) בהרשמה ומספק מספר כרטיס מדומה — paymentToken נוצר מיד. ADMIN מאשר → `subscriptionStatus = ACTIVE`, `subscriptionEndDate` מחושב לפי התוכנית (+1 חודש / +12 חודשים).
 
 **Auth flow**: `POST /api/auth/login` returns a JWT → client stores it in `localStorage` → sent as `Authorization: Bearer <token>` on every request → backend middleware validates and attaches the user to `req`.
 
@@ -53,16 +57,28 @@ Feature-based module structure. Each module contains:
 ```
 src/
 ├── global/
-│   ├── components/       ← reusable generic components (Form, Table, Page, etc.)
-│   ├── hooks/            ← reusable hooks (useAuth, ...)
+│   ├── components/       ← reusable generic components (GenericForm, GenericTable, GenericModal, GenericPage)
+│   ├── hooks/            ← reusable hooks (useAuth, useForm)
 │   ├── services/         ← axios instance with JWT interceptors
 │   ├── router.tsx        ← React Router v7 setup; wraps private routes in ProtectedRoute
 │   └── theme.ts          ← Material-UI v7 theme with RTL (stylis-plugin-rtl)
 ├── auth/
-│   ├── pages/            ← page components (one root component per page)
-│   ├── components/       ← module-specific components used by the pages
-│   ├── hooks/            ← data & logic hooks for this module
-│   └── services/         ← API calls (functions only, no state)
+│   ├── pages/
+│   ├── components/
+│   │   └── register/     ← קומפוננטות הרשמה מרובת שלבים (RegisterForm, RegistrationStep, PaymentStep, SuccessStep, PlanSelector)
+│   ├── hooks/
+│   ├── helpers/          ← register.helpers.ts, register.styles.ts
+│   ├── services/
+│   └── types/
+├── users/
+│   ├── pages/
+│   ├── components/       ← AllUsersTable, PendingUsersTable, UserDetailsModal
+│   ├── hooks/            ← useAllUsers, usePendingUsers, useApproveUser
+│   ├── helpers/          ← users.helpers.ts (label/color maps), users.columns.tsx (column defs)
+│   ├── services/
+│   └── types/
+├── billing/
+│   └── services/         ← billing.service.ts (tokenize)
 ├── clients/
 │   ├── pages/
 │   ├── components/
@@ -104,12 +120,49 @@ All of the above belongs in a **hook** (`<module>/hooks/use<Feature>.ts`). The c
 
 ### API Endpoints
 
+**Auth**
 | Method | Path | Auth | Roles |
 |--------|------|------|-------|
 | POST | `/api/auth/register` | No | — (יוצר קבלן, ממתין לאישור) |
 | POST | `/api/auth/login` | No | — |
-| GET | `/api/auth/pending` | Yes | ADMIN, OPERATOR |
-| PATCH | `/api/auth/users/:id/approve` | Yes | ADMIN |
+
+**Users**
+| Method | Path | Auth | Roles |
+|--------|------|------|-------|
+| GET | `/api/users` | Yes | ADMIN, OPERATOR |
+| GET | `/api/users/pending` | Yes | ADMIN, OPERATOR |
+| GET | `/api/users/:id` | Yes | ADMIN, OPERATOR |
+| PATCH | `/api/users/:id/approve` | Yes | ADMIN |
+| ~~PATCH~~ | ~~`/api/users/:id`~~ | | ~~ADMIN, OPERATOR~~ — not yet implemented |
+
+**Clients**
+| Method | Path | Auth | Roles |
+|--------|------|------|-------|
+| GET | `/api/clients` | Yes | CONTRACTOR, OPERATOR |
+| GET | `/api/clients/:id` | Yes | CONTRACTOR, OPERATOR |
+| POST | `/api/clients` | Yes | CONTRACTOR |
+| PUT | `/api/clients/:id` | Yes | CONTRACTOR |
+| DELETE | `/api/clients/:id` | Yes | CONTRACTOR |
+
+**Projects**
+| Method | Path | Auth | Roles |
+|--------|------|------|-------|
 | GET | `/api/projects` | Yes | CONTRACTOR, OPERATOR |
 | GET | `/api/projects/:id` | Yes | CONTRACTOR, OPERATOR |
 | POST | `/api/projects` | Yes | CONTRACTOR |
+
+**Billing**
+| Method | Path | Auth | Roles |
+|--------|------|------|-------|
+| POST | `/api/billing/tokenize` | Yes | CONTRACTOR — שומר כרטיס ללא חיוב, מחזיר token |
+| GET | `/api/billing/history` | Yes | CONTRACTOR — היסטוריית תשלומים |
+
+### Registration & Subscription Flow
+
+**plan: "monthly" / "annual"** — הרשמה כוללת תשלום מיידי:
+1. `POST /api/auth/register` עם `plan: "monthly" | "annual"` + `mockCardNumber`
+2. Server יוצר `paymentToken` (`mock_tok_<email>_<timestamp>`) ושומר על ה-User
+3. קבלן ממתין לאישור ADMIN
+4. ADMIN מאשר → `subscriptionStatus = ACTIVE`, `subscriptionStartDate = now`, `subscriptionEndDate = +1 חודש / +12 חודשים`
+
+**סיום מנוי** → `subscriptionStatus = INACTIVE` → קריאה בלבד (GET מותר)

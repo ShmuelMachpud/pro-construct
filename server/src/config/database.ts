@@ -1,6 +1,6 @@
 import { DataSource } from "typeorm";
 import { ENV } from "./environments";
-import { User } from "../auth/model/user.entity";
+import { User } from "../users/model/user.entity";
 import { Client } from "../clients/model/client.entity";
 import { Project } from "../projects/model/project.entity";
 

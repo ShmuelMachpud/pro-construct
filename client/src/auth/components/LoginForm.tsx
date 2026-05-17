@@ -6,14 +6,14 @@ import { useLogin } from "../hooks/useLogin";
 import { getLoginFormInfo } from "../helpers/login.helpers";
 
 const LoginForm = () => {
-  const { values, setValue, error, loading, handleLogin } = useLogin();
+  const { values, setValue, errors, error, loading, handleLogin } = useLogin();
 
   return (
     <GenericForm
       title="ProConstruct"
       subtitle="התחברות למערכת"
       icon={<Construction sx={{ color: "primary.main", fontSize: 36 }} />}
-      infoForm={getLoginFormInfo(values, setValue)}
+      infoForm={getLoginFormInfo(values, setValue, errors)}
       onSubmit={handleLogin}
       submitLabel="התחבר"
       loading={loading}

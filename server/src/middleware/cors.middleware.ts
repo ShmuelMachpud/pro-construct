@@ -3,7 +3,12 @@ import { ENV } from "../config/environments";
 
 export const corsMiddleware = cors({
   origin: (origin, callback) => {
-    if (origin && ENV.ALLOWED_ORIGINS.includes(origin)) {
+    // No origin = server-to-server (webhooks, cron jobs) — always allow
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+    if (ENV.ALLOWED_ORIGINS.includes(origin)) {
       callback(null, true);
       return;
     }

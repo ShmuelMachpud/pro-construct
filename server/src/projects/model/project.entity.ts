@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { User } from "../../auth/model/user.entity";
+import { User } from "../../users/model/user.entity";
 import { Client } from "../../clients/model/client.entity";
 
 export enum ProjectType {

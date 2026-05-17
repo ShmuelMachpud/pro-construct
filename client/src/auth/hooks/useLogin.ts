@@ -2,16 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/auth.service";
 import { useForm } from "../../global/hooks/useForm";
-import { loginInitialData } from "../helpers/login.helpers";
+import { loginInitialData, loginSchema } from "../helpers/login.helpers";
 import type { LoginFormType } from "../types/auth.types";
 
 export const useLogin = () => {
   const navigate = useNavigate();
-  const { values, setValue, errors } = useForm<LoginFormType>(loginInitialData);
+  const { values, setValue, errors, validate } = useForm<LoginFormType>(loginInitialData);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    if (!validate(loginSchema)) return;
+
     setError("");
     setLoading(true);
     try {

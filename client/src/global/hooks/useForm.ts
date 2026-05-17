@@ -1,7 +1,7 @@
 import { useState } from "react";
+import type Joi from "joi";
 
 type FormValues = Record<string, string>;
-type ValidationRules<T extends FormValues> = Partial<Record<keyof T, (value: string) => string | undefined>>;
 
 export const useForm = <T extends FormValues>(initial: T) => {
   const [values, setValues] = useState<T>(initial);
@@ -12,20 +12,19 @@ export const useForm = <T extends FormValues>(initial: T) => {
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
 
-  const validate = (rules: ValidationRules<T>): boolean => {
-    const newErrors: Partial<Record<keyof T, string>> = {};
-    let valid = true;
-
-    for (const key in rules) {
-      const error = rules[key]?.(values[key] ?? "");
-      if (error) {
-        newErrors[key] = error;
-        valid = false;
-      }
+  const validate = (schema: Joi.ObjectSchema): boolean => {
+    const result = schema.validate(values, { abortEarly: false });
+    if (!result.error) {
+      setErrors({});
+      return true;
     }
-
+    const newErrors: Partial<Record<keyof T, string>> = {};
+    result.error.details.forEach((detail) => {
+      const key = detail.path[0] as keyof T;
+      if (!newErrors[key]) newErrors[key] = detail.message;
+    });
     setErrors(newErrors);
-    return valid;
+    return false;
   };
 
   const reset = () => {
