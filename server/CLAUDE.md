@@ -24,8 +24,26 @@ src/
 │   ├── database.ts
 │   └── environments.ts                 ← ENV.PORT, DB_URL, JWT_SECRET, ALLOWED_ORIGINS
 ├── auth/
+│   ├── model/                          ← (empty — User entity lives in users/model/)
+│   ├── routes/                         ← POST /register, POST /login only
+│   ├── controllers/
+│   ├── services/
+│   ├── dal/                            ← findUserByEmail, createUser only (imports User from users/model/)
+│   ├── helpers/
+│   └── types/                          ← RegisterDto (plan: "monthly"|"annual", mockCardNumber), LoginDto
+├── users/
 │   ├── model/
-│   │   └── user.entity.ts              ← User entity + UserRole enum
+│   │   └── user.entity.ts              ← User entity + UserRole + SubscriptionStatus enums (shared with auth DAL)
+│   ├── routes/                         ← GET /, GET /pending, GET /:id, PATCH /:id/approve
+│   ├── controllers/
+│   ├── services/
+│   ├── dal/                            ← findAllUsers, findUserById, findPendingContractors, setUserApproved
+│   ├── helpers/
+│   │   └── users.normalized.ts         ← normalizedUser, normalizedUsers (strips password, selects client fields)
+│   └── types/                          ← UserForClient
+├── billing/
+│   ├── model/
+│   │   └── payment-history.entity.ts  ← PaymentHistory entity + PaymentStatus enum
 │   ├── routes/
 │   ├── controllers/
 │   ├── services/

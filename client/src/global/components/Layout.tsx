@@ -5,7 +5,7 @@ import Header from "./Header";
 
 const Layout = () => {
   return (
-    <Box sx={{ display: "flex", flexDirection: "row-reverse", minHeight: "100vh", backgroundColor: "#121212" }}>
+    <Box sx={{ display: "flex", flexDirection: "row", minHeight: "100vh", backgroundColor: "#121212" }}>
       <Sidebar />
       <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1, overflow: "hidden" }}>
         <Header />

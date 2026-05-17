@@ -2,11 +2,11 @@ import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { ENV } from "../config/environments";
 import { AuthPayload, AuthRequest } from "./auth.types";
-import { UserRole } from "../auth/model/user.entity";
+import { UserRole } from "../users/model/user.entity";
 import { logger } from "../utils/logger";
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;    
+  const authHeader = req.headers.authorization;      
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     res.status(401).json({ message: "Unauthorized" });

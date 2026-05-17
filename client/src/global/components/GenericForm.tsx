@@ -18,6 +18,7 @@ export interface FieldConfig {
   type?: "text" | "email" | "password" | "number";
   value: string;
   onChange: (value: string) => void;
+  error?: string;
 }
 
 interface GenericFormProps {
@@ -29,6 +30,7 @@ interface GenericFormProps {
   submitLabel: string;
   loading?: boolean;
   error?: string;
+  beforeSubmit?: ReactNode;
   footer?: ReactNode;
   sx?: SxProps<Theme>;
 }
@@ -42,6 +44,7 @@ const GenericForm = ({
   submitLabel,
   loading,
   error,
+  beforeSubmit,
   footer,
   sx,
 }: GenericFormProps) => {
@@ -80,6 +83,8 @@ const GenericForm = ({
               type={isPassword && !visible ? "password" : "text"}
               value={field.value}
               onChange={(e) => field.onChange(e.target.value)}
+              error={!!field.error}
+              helperText={field.error}
               margin="normal"
               slotProps={
                 isPassword
@@ -105,6 +110,8 @@ const GenericForm = ({
             {error}
           </Typography>
         )}
+
+        {beforeSubmit}
 
         <Button
           fullWidth

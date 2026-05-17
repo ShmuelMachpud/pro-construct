@@ -10,18 +10,22 @@ React 19 + TypeScript + Vite + Material-UI v7 + React Router v7.
 src/
 ├── global/
 │   ├── components/         ← reusable generic components (GenericForm, etc.)
-│   │   └── GenericForm.tsx ← config-driven form component
+│   │   ├── GenericForm.tsx ← config-driven form component
+│   │   ├── GenericPage.tsx ← full-screen background page wrapper (backgroundImage prop)
+│   │   ├── GenericTable.tsx
+│   │   └── GenericModal.tsx
 │   ├── hooks/              ← reusable hooks shared across modules
 │   │   ├── useAuth.ts
 │   │   └── useForm.ts      ← generic form state + validation hook
 │   ├── services/           ← axios instance with JWT interceptors
 │   ├── router.tsx          ← React Router v7 setup; wraps private routes in ProtectedRoute
 │   └── theme.ts            ← Material-UI v7 theme with RTL (stylis-plugin-rtl)
-├── <module>/               ← e.g. auth/, clients/, projects/
+├── <module>/               ← e.g. auth/, users/, clients/, projects/, billing/
 │   ├── pages/              ← one root component per route (no logic)
 │   ├── components/         ← module-specific components (call hooks, render UI)
+│   │   └── <feature>/      ← sub-folder when a feature has multiple related components
 │   ├── hooks/              ← all data/logic per feature (use<Feature>.ts)
-│   ├── helpers/            ← form field configs, initial data, pure utils
+│   ├── helpers/            ← form field configs, column definitions, label/color maps, style constants, pure utils
 │   ├── services/           ← API call functions only (no state)
 │   └── types/              ← TypeScript types for this module
 ```
@@ -139,6 +143,34 @@ interface FieldConfig {
 
 Password fields automatically get a show/hide toggle — managed internally by `GenericForm`.
 
+---
+
+## `GenericPage` — Full-Screen Background Page Wrapper
+
+**Location:** `src/global/components/GenericPage.tsx`
+
+Renders a full-screen `Box` with a background image (default: `/proconstruct.jpg`) and a dark overlay, then centers its children on top.
+
+```tsx
+<GenericPage>
+  <LoginForm />
+</GenericPage>
+
+// or with a custom background:
+<GenericPage backgroundImage="/other-bg.jpg">
+  <SomeForm />
+</GenericPage>
+```
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | — | Content centered on the page |
+| `backgroundImage` | `string?` | `/proconstruct.jpg` | CSS background-image URL |
+
+Use `GenericPage` as the root wrapper for all auth pages (login, register) instead of inline background `Box` code.
+
+---
+
 **`footer` — navigation link example:**
 ```tsx
 footer={
@@ -165,6 +197,17 @@ Every form feature follows this structure:
 └── pages/<Feature>Page.tsx        ← background/layout + <FeatureForm />
 ```
 
+**Multi-step forms** use the same pattern but split across step components inside a `components/<feature>/` sub-folder. The parent form component (`RegisterForm`) owns the step state and passes the right step component. Each step receives `values`, `setValue`, and `onNext`/`onBack` callbacks — no logic of its own.
+
+```
+auth/components/register/
+├── RegisterForm.tsx       ← step orchestrator (useState for step + plan)
+├── RegistrationStep.tsx   ← step 1: personal + company details
+├── PlanSelector.tsx       ← plan selection (monthly / annual)
+├── PaymentStep.tsx        ← step 2: mock card number
+└── SuccessStep.tsx        ← final confirmation screen
+```
+
 ### types file
 Define and export the form type:
 ```ts
@@ -172,6 +215,11 @@ export type LoginFormType = {
   email: string;
   password: string;
 };
+
+// auth/types/auth.types.ts also exports:
+export type RegisterFormType = { name, email, password, confirmPassword, phone, companyName, companyId, address };
+export type PaymentFormType = { mockCardNumber: string };
+export type RegisterPlan = "monthly" | "annual";
 ```
 
 ### helpers file
@@ -212,11 +260,15 @@ return (
 |------|---------|---------|
 | Pages | `<Feature>Page.tsx` | `LoginPage.tsx` |
 | Components | `<Feature>.tsx` | `LoginForm.tsx` |
+| Component sub-folders | `components/<feature>/` | `components/register/` |
 | Generic components | `Generic<Name>.tsx` | `GenericForm.tsx` |
 | Hooks | `use<Feature>.ts` | `useLogin.ts`, `useForm.ts` |
 | Services | `<module>.service.ts` | `auth.service.ts` |
 | Types | `<module>.types.ts` | `auth.types.ts` |
 | Type names | `<Feature>FormType` | `LoginFormType`, `RegisterFormType` |
-| Helpers | `<feature>.helpers.ts` | `login.helpers.ts` |
+| Helpers (forms) | `<feature>.helpers.ts` | `register.helpers.ts` |
+| Helpers (columns) | `<module>.columns.tsx` | `users.columns.tsx` |
+| Helpers (styles) | `<feature>.styles.ts` | `register.styles.ts` |
+| Helpers (maps/utils) | `<module>.helpers.ts` | `users.helpers.ts` |
 | Initial data | `<feature>InitialData` | `loginInitialData` |
 | Form info fn | `get<Feature>FormInfo` | `getLoginFormInfo` |

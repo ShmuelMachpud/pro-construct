@@ -1,35 +1,10 @@
-import { Box } from "@mui/material";
 import LoginForm from "../components/LoginForm";
+import GenericPage from "../../global/components/GenericPage";
 
-const BG_IMAGE = "/proconstruct.jpg";
-
-const LoginPage = () => {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        minHeight: "100vh",
-        backgroundImage: `url(${BG_IMAGE})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      <Box sx={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.7)" }} />
-
-      <Box
-        sx={{
-          position: "relative",
-          zIndex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-        }}
-      >
-        <LoginForm />
-      </Box>
-    </Box>
-  );
-};
+const LoginPage = () => (
+  <GenericPage>
+    <LoginForm />
+  </GenericPage>
+);
 
 export default LoginPage;

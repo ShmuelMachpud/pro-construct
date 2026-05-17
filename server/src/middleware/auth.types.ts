@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { UserRole } from "../auth/model/user.entity";
+import { UserRole } from "../users/model/user.entity";
 
 export interface AuthPayload {
   id: string;

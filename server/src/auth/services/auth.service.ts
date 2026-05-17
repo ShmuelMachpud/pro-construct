@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { ENV } from "../../config/environments";
-import { findUserByEmail, findUserById, createUser, setUserApproved, findPendingContractors } from "../dal/auth.dal";
+import { findUserByEmail, createUser } from "../dal/auth.dal";
 import { RegisterDto, LoginDto } from "../types/auth.types";
-import { UserRole } from "../model/user.entity";
+import { UserRole } from "../../users/model/user.entity";
 import { CustomError } from "../../utils/customError";
 
 export { RegisterDto, LoginDto };
@@ -21,6 +21,12 @@ export const registerService = async (dto: RegisterDto) => {
       password: hashedPassword,
       role: UserRole.CONTRACTOR,
       isApproved: false,
+      subscriptionPlan: dto.plan,
+      phone: dto.phone ?? null,
+      companyName: dto.companyName ?? null,
+      companyId: dto.companyId ?? null,
+      address: dto.address ?? null,
+      paymentToken: `mock_tok_${dto.email}_${Date.now()}`
     });
 
     const { password, ...userWithoutPassword } = user;
@@ -47,30 +53,6 @@ export const loginService = async (dto: LoginDto) => {
     );
 
     return { token };
-  } catch (error) {
-    return Promise.reject(error);
-  }
-};
-
-export const approveUserService = async (userId: string) => {
-  try {
-    const user = await findUserById(userId);
-    if (!user) throw new CustomError("User not found", 404);
-    if (user.role !== UserRole.CONTRACTOR) throw new CustomError("Only contractor accounts require approval", 400);
-    if (user.isApproved) throw new CustomError("User is already approved", 409);
-
-    const approved = await setUserApproved(userId);
-    const { password, ...userWithoutPassword } = approved;
-    return userWithoutPassword;
-  } catch (error) {
-    return Promise.reject(error);
-  }
-};
-
-export const getPendingContractorsService = async () => {
-  try {
-    const users = await findPendingContractors();
-    return users.map(({ password, ...u }) => u);
   } catch (error) {
     return Promise.reject(error);
   }
