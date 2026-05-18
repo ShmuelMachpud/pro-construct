@@ -1,4 +1,4 @@
-import axiosInstance from "../../global/services/axios";
+import axiosInstance from "../../global/services/axiosAuthService";
 import type { User, PendingUser } from "../types/users.types";
 
 export const getAllUsers = async (): Promise<User[]> => {
