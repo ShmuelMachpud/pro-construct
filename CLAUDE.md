@@ -1,168 +1,147 @@
-# CLAUDE.md
+# Shared Microservices Documentation
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Stack
 
-## Project Overview
+Express.js + TypeScript
 
-**pro-construct** is a construction project management web application. It is a monorepo with two packages:
-- `/client` — React 19 + TypeScript + Vite frontend
-- `/server` — Express 5 + TypeScript + TypeORM backend with PostgreSQL
-
-## Commands
-
-### Client (`/client`)
-```bash
-npm run dev      # Start Vite dev server
-npm run build    # TypeScript check + production build
-npm run lint     # ESLint
-npm run preview  # Preview production build
-```
-
-### Server (`/server`)
-```bash
-npm run dev      # Start with nodemon (watches src/, restarts on .ts changes)
-npm run build    # Compile TypeScript to dist/
-npm run start    # Run compiled output
-```
-
-Server requires a `.env` file with `PORT`, `DB_URL`, and `JWT_SECRET`.
+---
 
 ## Architecture
 
-### Backend (`/server/src`)
+### Server Bootstrap (`src/index.ts`)
 
-Uses a layered **routes → controller → service → DAL** pattern per feature module.
+The main entry point registers all global middleware (CORS, body parsing, router, error handler), then initializes the database connection.
 
-- `middleware/` — `authenticate` (JWT validation) and `authorize` (role check)
-- `auth/` — Registration and login only; DAL imports `User` from `users/model/`
-- `users/` — User management: listing, contractor approval; entity: `User` (includes UserRole + SubscriptionStatus enums)
-- `clients/` — Client CRUD; entity: `Client`
-- `projects/` — Project CRUD; entity: `Project`
-- `billing/` — Subscription management and payment history (planned; entity: `PaymentHistory`)
-- `config/database.ts` — TypeORM PostgreSQL data source (entities: User, Client, Project)
-- `config/environments.ts` — Loads env vars
+- **DB connection succeeds** → server starts listening, logs success
+- **DB connection fails** → logs the error, process exits
 
-**User roles**: `ADMIN` (מנהל המערכת), `OPERATOR` (עובד מטעם המנהל), `CONTRACTOR` (קבלן — המשתמש בפועל)
-
-**Approval flow**: קבלן נרשם עם `isApproved: false`. לוגין חסום עד שמנהל (ADMIN בלבד) מאשר דרך `PATCH /api/users/:id/approve`.
-
-**Subscription flow**: קבלן בוחר תוכנית (`monthly` / `annual`) בהרשמה ומספק מספר כרטיס מדומה — paymentToken נוצר מיד. ADMIN מאשר → `subscriptionStatus = ACTIVE`, `subscriptionEndDate` מחושב לפי התוכנית (+1 חודש / +12 חודשים).
-
-**Auth flow**: `POST /api/auth/login` returns a JWT → client stores it in `localStorage` → sent as `Authorization: Bearer <token>` on every request → backend middleware validates and attaches the user to `req`.
-
-### Frontend (`/client/src`)
-
-Feature-based module structure. Each module contains:
+### Directory Structure
 
 ```
 src/
-├── global/
-│   ├── components/       ← reusable generic components (GenericForm, GenericTable, GenericModal, GenericPage)
-│   ├── hooks/            ← reusable hooks (useAuth, useForm)
-│   ├── services/         ← axios instance with JWT interceptors
-│   ├── router.tsx        ← React Router v7 setup; wraps private routes in ProtectedRoute
-│   └── theme.ts          ← Material-UI v7 theme with RTL (stylis-plugin-rtl)
-├── auth/
-│   ├── pages/
-│   ├── components/
-│   │   └── register/     ← קומפוננטות הרשמה מרובת שלבים (RegisterForm, RegistrationStep, PaymentStep, SuccessStep, PlanSelector)
-│   ├── hooks/
-│   ├── helpers/          ← register.helpers.ts, register.styles.ts
-│   ├── services/
-│   └── types/
-├── users/
-│   ├── pages/
-│   ├── components/       ← AllUsersTable, PendingUsersTable, UserDetailsModal
-│   ├── hooks/            ← useAllUsers, usePendingUsers, useApproveUser
-│   ├── helpers/          ← users.helpers.ts (label/color maps), users.columns.tsx (column defs)
-│   ├── services/
-│   └── types/
-├── billing/
-│   └── services/         ← billing.service.ts (tokenize)
-├── clients/
-│   ├── pages/
-│   ├── components/
-│   ├── hooks/
-│   ├── services/
-│   └── types/
-└── projects/
-    ├── pages/
-    ├── components/
-    ├── hooks/
+├── index.ts               ← app bootstrap: middleware registration, DB init, server start
+├── config/
+│   ├── environment.ts     ← reads and exports env vars (PORT, DB_URL, etc.)
+│   └── database.ts        ← DB connection / DataSource (initialized once, imported by DALs)
+├── middleware/
+│   ├── cors.middleware.ts          ← CORS configuration
+│   ├── requestLogger.middleware.ts ← logs method, path, status, duration
+│   └── handleServerError.middleware.ts ← Express 4-param error handler
+├── routes/
+│   └── index.ts           ← central router: mounts all module routers + 404 catch-all
+├── utils/
+│   ├── logger.ts          ← application logger
+│   ├── customError.ts     ← CustomError class
+│   └── handleError.ts     ← shared error handler for controllers
+├── helpers/               ← shared domain helpers used across multiple modules
+└── <module>/              ← one directory per domain (users, projects, clients, ...)
+    ├── model/             ← entity definitions (when needed)
+    ├── routes/
+    ├── controllers/
     ├── services/
+    ├── dal/
+    ├── helpers/
     └── types/
 ```
 
-## Frontend Conventions
+### Module Structure
 
-### 1 — Component responsibility (Single Responsibility)
-
-Every component does **one thing only**. A page component is the single root component for that route — it composes other components but contains no logic of its own. Business logic, data fetching, normalization, and service calls belong exclusively in hooks.
+Each domain is a self-contained module under `src/`:
 
 ```
-LoginPage           ← renders the page layout, delegates to LoginForm
-  └── LoginForm     ← renders the form UI, calls useLogin hook
-        └── useLogin  ← owns the logic: calls auth service, handles errors, navigates
+<module>/
+├── model/           ← entity / schema (e.g. user.entity.ts)
+├── routes/          ← express router, endpoint definitions
+├── controllers/     ← request/response handling
+├── services/        ← orchestration, delegates logic to helpers
+├── dal/             ← data source communication
+├── helpers/         ← business logic and normalization for this module
+└── types/           ← TypeScript types and interfaces
 ```
 
-### 2 — Generic reusable components live in `global/components/`
+### Layer Responsibilities
 
-Components that may be used across more than one module (e.g. `<AppForm>`, `<AppTable>`, `<AppPage>`, `<AppModal>`) must be generic — no business-domain props — and placed in `src/global/components/`. Module-specific components stay inside `<module>/components/`.
+| Layer | Responsibility |
+|-------|----------------|
+| `routes/` | Define endpoints and attach middleware — nothing else |
+| `controllers/` | Parse request, call service, send response — no business logic |
+| `services/` | Orchestrate: call DAL + call helpers for logic, normalization, error management |
+| `dal/` | Communicate with data source — return raw/primitive data only, no business logic |
+| `helpers/` | Implement business logic and normalization — pure functions called by services |
+| `types/` | TypeScript interfaces, types, enums for this module |
+| `model/` | Entity definitions — imported by DAL and by other modules that need the type |
 
-### 3 — Components never call services or contain logic
+**Strict layering rule:** each layer imports only from the layer directly below it.
 
-Page, tile, card, table, and form **component files must not**:
-- import or call service functions directly
-- contain `useState` / `useEffect` for data fetching
-- perform data normalization or transformation
+```
+routes → controllers → services → dal
+                              ↘ helpers
+```
 
-All of the above belongs in a **hook** (`<module>/hooks/use<Feature>.ts`). The component receives data and callbacks as props (or calls the hook at the top level and passes results down). The rule: if you need to remove a `console.log`, open the hook — not the component.
+### Global vs Module Helpers
 
-### API Endpoints
+| Location | Contains |
+|----------|----------|
+| `src/helpers/` | Domain helpers shared across multiple modules |
+| `src/<module>/helpers/` | Helpers specific to one module only |
+| `src/utils/` | Technical infrastructure with no domain knowledge (logger, error handling) |
 
-**Auth**
-| Method | Path | Auth | Roles |
-|--------|------|------|-------|
-| POST | `/api/auth/register` | No | — (יוצר קבלן, ממתין לאישור) |
-| POST | `/api/auth/login` | No | — |
+**Rule:** if a helper can be copied to any other project unchanged — it belongs in `utils/`. If it knows domain concepts (user, subscription, project) but is used in multiple modules — it belongs in `src/helpers/`. If it's used in only one module — it belongs in `<module>/helpers/`.
 
-**Users**
-| Method | Path | Auth | Roles |
-|--------|------|------|-------|
-| GET | `/api/users` | Yes | ADMIN, OPERATOR |
-| GET | `/api/users/pending` | Yes | ADMIN, OPERATOR |
-| GET | `/api/users/:id` | Yes | ADMIN, OPERATOR |
-| PATCH | `/api/users/:id/approve` | Yes | ADMIN |
-| ~~PATCH~~ | ~~`/api/users/:id`~~ | | ~~ADMIN, OPERATOR~~ — not yet implemented |
+---
 
-**Clients**
-| Method | Path | Auth | Roles |
-|--------|------|------|-------|
-| GET | `/api/clients` | Yes | CONTRACTOR, OPERATOR |
-| GET | `/api/clients/:id` | Yes | CONTRACTOR, OPERATOR |
-| POST | `/api/clients` | Yes | CONTRACTOR |
-| PUT | `/api/clients/:id` | Yes | CONTRACTOR |
-| DELETE | `/api/clients/:id` | Yes | CONTRACTOR |
+## Conventions
 
-**Projects**
-| Method | Path | Auth | Roles |
-|--------|------|------|-------|
-| GET | `/api/projects` | Yes | CONTRACTOR, OPERATOR |
-| GET | `/api/projects/:id` | Yes | CONTRACTOR, OPERATOR |
-| POST | `/api/projects` | Yes | CONTRACTOR |
+### Functions
 
-**Billing**
-| Method | Path | Auth | Roles |
-|--------|------|------|-------|
-| POST | `/api/billing/tokenize` | Yes | CONTRACTOR — שומר כרטיס ללא חיוב, מחזיר token |
-| GET | `/api/billing/history` | Yes | CONTRACTOR — היסטוריית תשלומים |
+- **Single responsibility** — every function does exactly one thing
+- **Arrow functions only** — no `function` keyword
+- **Generic when reused** — a function used in more than one place must be generic, not duplicated
+- **No mutation of parameters** — functions never modify their inputs; return new values instead
+- **No file longer than 150 lines**
 
-### Registration & Subscription Flow
+### Async & Error Handling
 
-**plan: "monthly" / "annual"** — הרשמה כוללת תשלום מיידי:
-1. `POST /api/auth/register` עם `plan: "monthly" | "annual"` + `mockCardNumber`
-2. Server יוצר `paymentToken` (`mock_tok_<email>_<timestamp>`) ושומר על ה-User
-3. קבלן ממתין לאישור ADMIN
-4. ADMIN מאשר → `subscriptionStatus = ACTIVE`, `subscriptionStartDate = now`, `subscriptionEndDate = +1 חודש / +12 חודשים`
+- Every async function is wrapped in `try/catch`
+- `catch` always returns `Promise.reject(error)` — errors bubble up unchanged until the controller
+- Controllers catch errors exclusively via `handleError(error, res)` — never inline `res.status(...).json(...)` for errors
+- Use `CustomError(message, status)` for every expected error — pick the right HTTP status (400, 401, 403, 404, 409...)
+- Never use `console.log` — always use `logger`
 
-**סיום מנוי** → `subscriptionStatus = INACTIVE` → קריאה בלבד (GET מותר)
+### Single-Line If Statements
+
+When an `if` contains exactly one statement (typically a guard clause), write it on one line without braces:
+
+```ts
+if (!user) throw new CustomError("User not found", 404);
+if (!token) return Promise.reject(new CustomError("Unauthorized", 401));
+```
+
+### TypeScript
+
+- **No `any`** — always define an explicit type
+- **`const` by default** — use `let` only when the value must be reassigned
+- **No nested ternaries** — maximum one level
+- **Destructuring** — prefer destructuring over repeated property access
+- **Types in `types/` files only** — interfaces and types must not be defined inline inside service, controller, or DAL files
+
+### Exports & Naming
+
+- **Named exports only** — no default exports in any file
+- **No magic strings or numbers** — use enums or named constants
+- **Descriptive names** — no generic names like `data`, `temp`, `result`, `res` (outside of Express handler signatures)
+
+### Module Independence
+
+- A module never imports from another module's `dal/` — only from its `service/`
+- `model/` files are the only exception: they may be imported by other modules that need the entity type for a relation
+
+### HTTP
+
+- Consistent status codes: `200` GET/PUT, `201` POST, `204` DELETE (no body)
+- All error responses return `{ message: string }`
+- All success responses return the full entity, not just the `id`
+
+### Environment Variables
+
+- Access env vars only through `config/environment.ts` — never use `process.env` directly anywhere else

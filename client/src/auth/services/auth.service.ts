@@ -1,4 +1,4 @@
-import axiosInstance from "../../global/services/axios";
+import axiosInstance from "../../global/services/axiosAuthService";
 import type { RegisterFormType, RegisterPlan } from "../types/auth.types";
 
 export const login = async (email: string, password: string) => {
