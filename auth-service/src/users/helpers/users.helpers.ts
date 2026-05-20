@@ -1,13 +1,23 @@
 import { User } from "../model/users.entity";
-import { SetApprovalData, SubscriptionPlan, SubscriptionStatus, UserForClient } from "../types/users.types";
+import {
+  SetApprovalData,
+  SubscriptionPlan,
+  SubscriptionStatus,
+  UserForClient,
+} from "../types/users.types";
 
-export const calcSubscriptionEndDate = (plan: SubscriptionPlan, from: Date): Date => {
+export const calcSubscriptionEndDate = (
+  plan: SubscriptionPlan,
+  from: Date,
+): Date => {
   const end = new Date(from);
   end.setMonth(end.getMonth() + (plan === SubscriptionPlan.ANNUAL ? 12 : 1));
   return end;
 };
 
-export const normalizedApprovalData = (plan: SubscriptionPlan): SetApprovalData => {
+export const normalizedApprovalData = (
+  plan: SubscriptionPlan,
+): SetApprovalData => {
   const now = new Date();
   return {
     isApproved: true,
@@ -28,6 +38,7 @@ export const normalizedUser = (user: User) => ({
   companyName: user.companyName,
   companyId: user.companyId,
   address: user.address,
+  createdAt: user.createdAt,
 });
 
 export const normalizedUsers = (users: User[]) => {

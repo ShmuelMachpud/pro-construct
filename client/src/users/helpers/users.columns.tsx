@@ -1,6 +1,6 @@
 import { Chip, Typography } from "@mui/material";
 import type { ColumnDef } from "../../global/components/GenericTable";
-import type { User, PendingUser } from "../types/users.types";
+import type { UserInterface} from "../types/users.types";
 import { roleLabel, subscriptionLabel, subscriptionColor, formatDate } from "./users.helpers";
 
 const ApprovalChip = ({ isApproved }: { isApproved: boolean }) =>
@@ -10,7 +10,7 @@ const ApprovalChip = ({ isApproved }: { isApproved: boolean }) =>
     <Chip label="ממתין" size="small" sx={{ backgroundColor: "rgba(255,107,0,0.15)", color: "#FF6B00" }} />
   );
 
-export const allUsersColumns: ColumnDef<User>[] = [
+export const allUsersColumns: ColumnDef<UserInterface>[] = [
   { key: "name", label: "שם" },
   { key: "email", label: "אימייל" },
   { key: "role", label: "תפקיד", render: (row) => roleLabel[row.role] ?? row.role },
@@ -35,7 +35,7 @@ export const allUsersColumns: ColumnDef<User>[] = [
   { key: "createdAt", label: "הרשמה", render: (row) => formatDate(row.createdAt) },
 ];
 
-export const pendingUsersColumns: ColumnDef<PendingUser>[] = [
+export const pendingUsersColumns: ColumnDef<UserInterface>[] = [
   { key: "name", label: "שם" },
   { key: "email", label: "אימייל" },
   { key: "companyName", label: "חברה", render: (row) => row.companyName ?? "—" },

@@ -1,55 +1,61 @@
-import { Client } from "../model/client.entity";
-import {
-  createClient,
-  getClientsByContractor,
-  getClientById,
-  updateClient,
-  deleteClient,
-} from "../dal/clients.dal";
-import { CreateClientDto } from "../types/clients.types";
 import { CustomError } from "../../utils/customError";
+import {
+  findAllClientsDal,
+  findClientByIdDal,
+  insertClientDal,
+  updateClientByIdDal,
+  deleteClientDal,
+} from "../dal/clients.dal";
+import { normalizeCreateClient } from "../helpers/clients.helpers";
+import { CreateClientDto, UpdateClientDto } from "../types/clients.types";
 
-export { CreateClientDto };
-
-export const createClientService = async (dto: CreateClientDto, contractorId: string): Promise<Client> => {
+export const getAllClientsService = async (userId: string) => {
   try {
-    return await createClient({ ...dto, contractorId } as any);
+    return await findAllClientsDal(userId);
   } catch (error) {
     return Promise.reject(error);
   }
 };
 
-export const getClientsService = async (contractorId: string): Promise<Client[]> => {
+export const getClientByIdService = async (id: string, userId: string) => {
   try {
-    return await getClientsByContractor(contractorId);
+    const item = await findClientByIdDal(id, userId);
+    if (!item) throw new CustomError("Client not found", 404);
+    return item;
   } catch (error) {
     return Promise.reject(error);
   }
 };
 
-export const getClientByIdService = async (id: number, contractorId: string): Promise<Client> => {
+export const createClientService = async (
+  dto: CreateClientDto,
+  userId: string,
+) => {
   try {
-    const client = await getClientById(id, contractorId);
-    if (!client) throw new CustomError("Client not found", 404);
-    return client;
+    const normalizedDto = normalizeCreateClient(dto, userId);
+    return await insertClientDal(normalizedDto);
   } catch (error) {
     return Promise.reject(error);
   }
 };
 
-export const updateClientService = async (id: number, contractorId: string, dto: Partial<CreateClientDto>): Promise<Client> => {
+export const updateClientService = async (
+  id: string,
+  dto: UpdateClientDto,
+  userId: string,
+) => {
   try {
-    const client = await updateClient(id, contractorId, dto as any);
-    if (!client) throw new CustomError("Client not found", 404);
-    return client;
+    const item = await updateClientByIdDal(id, dto, userId);
+    if (!item) throw new CustomError("Client not found", 404);
+    return item;
   } catch (error) {
     return Promise.reject(error);
   }
 };
 
-export const deleteClientService = async (id: number, contractorId: string): Promise<void> => {
+export const removeClientService = async (id: string, userId: string) => {
   try {
-    const deleted = await deleteClient(id, contractorId);
+    const deleted = await deleteClientDal(id, userId);
     if (!deleted) throw new CustomError("Client not found", 404);
   } catch (error) {
     return Promise.reject(error);

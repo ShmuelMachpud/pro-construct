@@ -5,11 +5,11 @@ import { usePendingUsers } from "../hooks/usePendingUsers";
 import { useApproveUser } from "../hooks/useApproveUser";
 import UserDetailsModal from "./UserDetailsModal";
 import { pendingUsersColumns } from "../helpers/users.columns";
-import type { PendingUser } from "../types/users.types";
+import type { UserInterface } from "../types/users.types";
 
 const PendingUsersTable = () => {
   const { users, loading, error, removeUser } = usePendingUsers();
-  const [selectedUser, setSelectedUser] = useState<PendingUser | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
 
   const { approve, loading: approving } = useApproveUser((userId) => {
     removeUser(userId);
@@ -20,7 +20,7 @@ const PendingUsersTable = () => {
 
   return (
     <>
-      <GenericTable<PendingUser>
+      <GenericTable<UserInterface>
         columns={pendingUsersColumns}
         rows={users}
         loading={loading}

@@ -1,22 +1,26 @@
+type ClientType = "private" | "business";
+
 export interface Client {
-  id: number;
+  id: string;
+  type: ClientType;
   name: string;
-  type: "private" | "business";
   phone: string;
-  email?: string;
-  address?: string;
-  idNumber?: string;
-  notes?: string;
-  contractorId: number;
+  email: string;
+  address: string;
+  billingName?: string;
+  billingPhone?: string;
+  billingAddress?: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateClientDto {
+  type: ClientType;
   name: string;
-  type: "private" | "business";
   phone: string;
-  email?: string;
-  address?: string;
-  idNumber?: string;
-  notes?: string;
+  email: string;
+  address: string;
+  billingName?: string;
+  billingPhone?: string;
+  billingAddress?: string;
 }

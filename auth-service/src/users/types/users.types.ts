@@ -31,6 +31,7 @@ export interface UserForClient extends Pick<
   | "companyName"
   | "companyId"
   | "address"
+  | "createdAt"
 > {}
 export interface CreateUserDto extends Pick<
   User,

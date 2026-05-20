@@ -1,19 +1,37 @@
+export enum ProjectType {
+  CONSTRUCTION = "construction",
+  RENOVATION = "renovation",
+}
+
+export enum ProjectStatus {
+  PLANNING = "planning",
+  IN_PROGRESS = "in_progress",
+  COMPLETED = "completed",
+}
+
 export interface CreateProjectDto {
+  clientId: string;
   name: string;
-  type: string;
-  city: string;
-  address?: string;
-  budget?: number;
-  permitStatus?: string;
-  siteManagerId?: string;
-  clientId?: number;
-  newClient?: {
-    name: string;
-    type: string;
-    phone: string;
-    email?: string;
-    address?: string;
-    idNumber?: string;
-    notes?: string;
-  };
+  type: ProjectType;
+  location: string;
+  status?: ProjectStatus;
+  startDate?: string | null;
+  endDate?: string | null;
+  description?: string | null;
+  squareMeters?: number | null;
+  permitNumber?: string | null;
+  notes?: string | null;
+}
+
+export interface UpdateProjectDto {
+  name?: string;
+  type?: ProjectType;
+  status?: ProjectStatus;
+  location?: string;
+  startDate?: string | null;
+  endDate?: string | null;
+  description?: string | null;
+  squareMeters?: number | null;
+  permitNumber?: string | null;
+  notes?: string | null;
 }

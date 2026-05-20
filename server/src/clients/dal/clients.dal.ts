@@ -1,32 +1,35 @@
 import { AppDataSource } from "../../config/database";
 import { Client } from "../model/client.entity";
+import { CreateClientInterface, UpdateClientDto } from "../types/clients.types";
 
-const clientRepository = AppDataSource.getRepository(Client);
+const repository = AppDataSource.getRepository(Client);
 
-export const createClient = async (data: Partial<Client>): Promise<Client> => {
-  const client = clientRepository.create(data);
-  return await clientRepository.save(client);
-};
-
-export const getClientsByContractor = async (contractorId: string): Promise<Client[]> => {
-  return await clientRepository.find({
-    where: { contractorId },
+export const findAllClientsDal = async (userId: string) => {
+  return await repository.find({
+    where: { contractorId: userId },
     order: { createdAt: "DESC" },
   });
 };
 
-export const getClientById = async (id: number, contractorId: string): Promise<Client | null> => {
-  return await clientRepository.findOne({
-    where: { id, contractorId },
-  });
+export const findClientByIdDal = async (id: string, userId: string) => {
+  return await repository.findOne({ where: { id, contractorId: userId } });
 };
 
-export const updateClient = async (id: number, contractorId: string, data: Partial<Client>): Promise<Client | null> => {
-  await clientRepository.update({ id, contractorId }, data);
-  return await clientRepository.findOne({ where: { id, contractorId } });
+export const insertClientDal = async (data: CreateClientInterface) => {
+  const item = repository.create(data);
+  return await repository.save(item);
 };
 
-export const deleteClient = async (id: number, contractorId: string): Promise<boolean> => {
-  const result = await clientRepository.delete({ id, contractorId });
+export const updateClientByIdDal = async (
+  id: string,
+  data: UpdateClientDto,
+  userId: string,
+) => {
+  await repository.update(id, data);
+  return await repository.findOne({ where: { id, contractorId: userId } });
+};
+
+export const deleteClientDal = async (id: string, userId: string) => {
+  const result = await repository.delete({ id, contractorId: userId });
   return (result.affected ?? 0) > 0;
 };

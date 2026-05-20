@@ -13,11 +13,16 @@ export const createClient = async (dto: CreateClientDto): Promise<Client> => {
   return data;
 };
 
-export const updateClient = async (id: number, dto: Partial<CreateClientDto>): Promise<Client> => {
+export const updateClient = async (id: string, dto: Partial<CreateClientDto>): Promise<Client> => {
   const { data } = await axiosInstance.put(`/clients/${id}`, dto);
   return data;
 };
 
-export const deleteClient = async (id: number): Promise<void> => {
+export const deleteClient = async (id: string): Promise<void> => {
   await axiosInstance.delete(`/clients/${id}`);
+};
+
+export const getClientById = async (id: string): Promise<Client> => {
+  const { data } = await axiosInstance.get(`/clients/${id}`);
+  return data;
 };

@@ -5,11 +5,11 @@ import { useAllUsers } from "../hooks/useAllUsers";
 import { useApproveUser } from "../hooks/useApproveUser";
 import UserDetailsModal from "./UserDetailsModal";
 import { allUsersColumns } from "../helpers/users.columns";
-import type { User } from "../types/users.types";
+import type { UserInterface } from "../types/users.types";
 
 const AllUsersTable = () => {
   const { users, loading, error, approveUserLocally } = useAllUsers();
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
 
   const { approve, loading: approving } = useApproveUser((userId) => {
     approveUserLocally(userId);
@@ -20,7 +20,7 @@ const AllUsersTable = () => {
 
   return (
     <>
-      <GenericTable<User>
+      <GenericTable<UserInterface>
         columns={allUsersColumns}
         rows={users}
         loading={loading}

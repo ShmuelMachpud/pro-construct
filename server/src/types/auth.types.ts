@@ -1,9 +1,8 @@
 import { Request } from "express";
-import { UserRole } from "../users/model/user.entity";
 
 export interface AuthPayload {
   id: string;
-  role: UserRole;
+  role: string;
 }
 
 export interface AuthRequest extends Request {

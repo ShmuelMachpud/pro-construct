@@ -1,32 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { User } from "../../users/model/user.entity";
-import { Client } from "../../clients/model/client.entity";
-
-export enum ProjectType {
-  NEW_CONSTRUCTION = "new_construction",
-  RENOVATION = "renovation",
-  INFRASTRUCTURE = "infrastructure",
-  OTHER = "other",
-}
-
-export enum ProjectStatus {
-  PLANNING = "planning",
-  IN_PROGRESS = "in_progress",
-  ON_HOLD = "on_hold",
-  COMPLETED = "completed",
-}
-
-export enum PermitStatus {
-  NOT_REQUIRED = "not_required",
-  PENDING = "pending",
-  APPROVED = "approved",
-  REJECTED = "rejected",
-}
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
+import { ProjectType, ProjectStatus } from "../types/projects.types";
 
 @Entity("projects")
 export class Project {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
+
+  @Column({ type: "uuid" })
+  clientId: string;
 
   @Column()
   name: string;
@@ -38,37 +25,25 @@ export class Project {
   status: ProjectStatus;
 
   @Column()
-  city: string;
+  location: string;
 
-  @Column({ nullable: true })
-  address: string;
+  @Column({ type: "date", nullable: true })
+  startDate: Date | null;
 
-  @Column({ nullable: true, type: "decimal", precision: 10, scale: 2 })
-  budget: number;
+  @Column({ type: "date", nullable: true })
+  endDate: Date | null;
 
-  @Column({ type: "enum", enum: PermitStatus, nullable: true })
-  permitStatus: PermitStatus;
+  @Column({ type: "varchar", nullable: true })
+  description: string | null;
 
-  @Column()
-  contractorId: string;
+  @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
+  squareMeters: number | null;
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: "contractorId" })
-  contractor: User;
+  @Column({ type: "varchar", nullable: true })
+  permitNumber: string | null;
 
-  @Column()
-  clientId: number;
-
-  @ManyToOne(() => Client)
-  @JoinColumn({ name: "clientId" })
-  client: Client;
-
-  @Column({ nullable: true })
-  siteManagerId: string;
-
-  @ManyToOne(() => User, { nullable: true })
-  @JoinColumn({ name: "siteManagerId" })
-  siteManager: User;
+  @Column({ type: "text", nullable: true })
+  notes: string | null;
 
   @CreateDateColumn()
   createdAt: Date;
