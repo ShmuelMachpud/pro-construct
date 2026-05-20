@@ -1,23 +1,9 @@
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, TextField, MenuItem, Box, Typography
+  Button, TextField, MenuItem, Box, Typography, CircularProgress,
 } from "@mui/material";
-import { useState } from "react";
-import { createProject } from "../services/project.service";
-
-const projectTypes = [
-  { value: "new_construction", label: "בנייה חדשה" },
-  { value: "renovation", label: "שיפוץ" },
-  { value: "infrastructure", label: "תשתיות" },
-  { value: "other", label: "אחר" },
-];
-
-const permitStatuses = [
-  { value: "not_required", label: "לא נדרש" },
-  { value: "pending", label: "בהמתנה" },
-  { value: "approved", label: "אושר" },
-  { value: "rejected", label: "נדחה" },
-];
+import { useCreateProject } from "../hooks/useCreateProject";
+import { projectTypeOptions, projectStatusOptions } from "../helpers/createProject.helpers";
 
 interface Props {
   open: boolean;
@@ -26,52 +12,13 @@ interface Props {
 }
 
 const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [form, setForm] = useState({
-    name: "",
-    type: "",
-    city: "",
-    address: "",
-    budget: "",
-    permitStatus: "",
-    clientId: "",
-  });
-
-  const handleChange = (field: string, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = async () => {
-    setError("");
-
-    if (!form.name || !form.type || !form.city || !form.clientId) {
-      setError("שם פרויקט, סוג, עיר ולקוח הם שדות חובה");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await createProject({
-        ...form,
-        budget: form.budget ? Number(form.budget) : undefined,
-        clientId: Number(form.clientId),
-        permitStatus: form.permitStatus || undefined,
-      });
-      onCreated();
-      onClose();
-      setForm({ name: "", type: "", city: "", address: "", budget: "", permitStatus: "", clientId: "" });
-    } catch {
-      setError("אירעה שגיאה ביצירת הפרויקט");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { values, setValue, errors, clients, loadingClients, loading, error, handleSubmit, handleClose } =
+    useCreateProject(open, onCreated, onClose);
 
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       maxWidth="sm"
       fullWidth
       PaperProps={{
@@ -93,62 +40,113 @@ const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
           <TextField
             label="שם פרויקט *"
             fullWidth
-            value={form.name}
-            onChange={(e) => handleChange("name", e.target.value)}
+            value={values.name}
+            onChange={(e) => setValue("name", e.target.value)}
+            error={!!errors.name}
+            helperText={errors.name}
           />
 
           <TextField
             label="סוג פרויקט *"
             fullWidth
             select
-            value={form.type}
-            onChange={(e) => handleChange("type", e.target.value)}
+            value={values.type}
+            onChange={(e) => setValue("type", e.target.value)}
+            error={!!errors.type}
+            helperText={errors.type}
           >
-            {projectTypes.map((t) => (
+            {projectTypeOptions.map((t) => (
               <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>
             ))}
           </TextField>
 
           <TextField
-            label="עיר *"
+            label="מיקום *"
             fullWidth
-            value={form.city}
-            onChange={(e) => handleChange("city", e.target.value)}
+            value={values.location}
+            onChange={(e) => setValue("location", e.target.value)}
+            error={!!errors.location}
+            helperText={errors.location}
           />
 
           <TextField
-            label="כתובת"
-            fullWidth
-            value={form.address}
-            onChange={(e) => handleChange("address", e.target.value)}
-          />
-
-          <TextField
-            label="תקציב מאושר"
-            fullWidth
-            type="number"
-            value={form.budget}
-            onChange={(e) => handleChange("budget", e.target.value)}
-          />
-
-          <TextField
-            label="מצב היתרי בנייה"
+            label="לקוח *"
             fullWidth
             select
-            value={form.permitStatus}
-            onChange={(e) => handleChange("permitStatus", e.target.value)}
+            value={values.clientId}
+            onChange={(e) => setValue("clientId", e.target.value)}
+            error={!!errors.clientId}
+            helperText={errors.clientId}
+            disabled={loadingClients}
+            slotProps={loadingClients ? { input: { endAdornment: <CircularProgress size={18} /> } } : undefined}
           >
-            {permitStatuses.map((p) => (
-              <MenuItem key={p.value} value={p.value}>{p.label}</MenuItem>
+            {clients.map((c) => (
+              <MenuItem key={c.id} value={String(c.id)}>{c.name}</MenuItem>
             ))}
           </TextField>
 
           <TextField
-            label="מזהה לקוח *"
+            label="סטטוס"
+            fullWidth
+            select
+            value={values.status}
+            onChange={(e) => setValue("status", e.target.value)}
+          >
+            <MenuItem value="">ללא</MenuItem>
+            {projectStatusOptions.map((s) => (
+              <MenuItem key={s.value} value={s.value}>{s.label}</MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            label="תאריך התחלה"
+            fullWidth
+            type="date"
+            value={values.startDate}
+            onChange={(e) => setValue("startDate", e.target.value)}
+            slotProps={{ inputLabel: { shrink: true } }}
+          />
+
+          <TextField
+            label="תאריך סיום"
+            fullWidth
+            type="date"
+            value={values.endDate}
+            onChange={(e) => setValue("endDate", e.target.value)}
+            slotProps={{ inputLabel: { shrink: true } }}
+          />
+
+          <TextField
+            label="תיאור"
+            fullWidth
+            multiline
+            rows={3}
+            value={values.description}
+            onChange={(e) => setValue("description", e.target.value)}
+          />
+
+          <TextField
+            label="מ״ר"
             fullWidth
             type="number"
-            value={form.clientId}
-            onChange={(e) => handleChange("clientId", e.target.value)}
+            value={values.squareMeters}
+            onChange={(e) => setValue("squareMeters", e.target.value)}
+          />
+
+          <TextField
+            label="מספר היתר"
+            fullWidth
+            value={values.permitNumber}
+            onChange={(e) => setValue("permitNumber", e.target.value)}
+          />
+
+          <TextField
+            label="הערות"
+            fullWidth
+            multiline
+            rows={2}
+            value={values.notes}
+            onChange={(e) => setValue("notes", e.target.value)}
           />
 
           {error && (
@@ -160,7 +158,7 @@ const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
       </DialogContent>
 
       <DialogActions sx={{ p: 3, pt: 0 }}>
-        <Button onClick={onClose} sx={{ color: "grey.400" }}>
+        <Button onClick={handleClose} sx={{ color: "grey.400" }}>
           ביטול
         </Button>
         <Button variant="contained" onClick={handleSubmit} disabled={loading}>

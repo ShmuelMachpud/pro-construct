@@ -8,7 +8,7 @@ export const roleLabel: Record<string, string> = {
 
 export const subscriptionLabel: Record<SubscriptionStatus, string> = {
   active: "פעיל",
-  trial: "ניסיון",
+  pending: "ממתין",
   inactive: "לא פעיל",
   past_due: "חוב תשלום",
   cancelled: "בוטל",
@@ -16,7 +16,7 @@ export const subscriptionLabel: Record<SubscriptionStatus, string> = {
 
 export const subscriptionColor: Record<SubscriptionStatus, string> = {
   active: "#4CAF50",
-  trial: "#FF6B00",
+  pending: "#FF6B00",
   inactive: "#9E9E9E",
   past_due: "#F44336",
   cancelled: "#9E9E9E",

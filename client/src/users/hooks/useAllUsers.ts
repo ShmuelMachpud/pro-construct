@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { getAllUsers } from "../services/users.service";
-import type { User } from "../types/users.types";
+import type { UserInterface } from "../types/users.types";
 
 export const useAllUsers = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -15,7 +15,9 @@ export const useAllUsers = () => {
   }, []);
 
   const approveUserLocally = (userId: string) =>
-    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, isApproved: true } : u)));
+    setUsers((prev) =>
+      prev.map((u) => (u.id === userId ? { ...u, isApproved: true } : u)),
+    );
 
   return { users, loading, error, approveUserLocally };
 };

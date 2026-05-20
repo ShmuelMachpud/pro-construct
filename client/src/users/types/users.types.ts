@@ -1,15 +1,17 @@
 export type SubscriptionStatus =
   | "active"
   | "inactive"
-  | "trial"
   | "past_due"
-  | "cancelled";
+  | "cancelled"
+  | "pending";
 
-export type User = {
+export type UserRole = "admin" | "operator" | "contractor";
+
+export interface UserInterface  {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: UserRole;
   isApproved: boolean;
   subscriptionStatus: SubscriptionStatus | null;
   subscriptionStartDate: string | null;
@@ -22,5 +24,3 @@ export type User = {
   createdAt: string;
   updatedAt: string;
 };
-
-export type PendingUser = User;

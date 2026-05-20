@@ -130,6 +130,7 @@ if (!token) return Promise.reject(new CustomError("Unauthorized", 401));
 - **Named exports only** — no default exports in any file
 - **No magic strings or numbers** — use enums or named constants
 - **Descriptive names** — no generic names like `data`, `temp`, `result`, `res` (outside of Express handler signatures)
+- **Layer suffix in function names** — controller functions end with `Controller`, service functions end with `Service`, DAL functions end with `Dal`
 
 ### Module Independence
 

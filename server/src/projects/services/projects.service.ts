@@ -1,51 +1,62 @@
-import { Project } from "../model/project.entity";
-import { createProject, getProjectsByContractor, getProjectById } from "../dal/projects.dal";
-import { createClientService } from "../../clients/services/clients.service";
-import { CreateProjectDto } from "../types/projects.types";
 import { CustomError } from "../../utils/customError";
+import { CreateProjectDto, UpdateProjectDto } from "../types/projects.types";
+import {
+  findProjectsByContractorDal,
+  findProjectsByClientDal,
+  findProjectByIdDal,
+  insertProjectDal,
+  updateProjectByIdDal,
+  deleteProjectDal,
+} from "../dal/projects.dal";
 
-export { CreateProjectDto };
-
-export const createProjectService = async (dto: CreateProjectDto, contractorId: string): Promise<Project> => {
+export const getProjectsByContractorService = async (contractorId: string) => {
   try {
-    let clientId = dto.clientId;
-
-    if (!clientId && dto.newClient) {
-      const client = await createClientService(dto.newClient, contractorId);
-      clientId = client.id;
-    }
-
-    if (!clientId) throw new CustomError("Client is required", 400);
-
-    return await createProject({
-      name: dto.name,
-      type: dto.type as any,
-      city: dto.city,
-      address: dto.address,
-      budget: dto.budget,
-      permitStatus: dto.permitStatus as any,
-      clientId,
-      contractorId,
-      siteManagerId: dto.siteManagerId,
-    });
+    return await findProjectsByContractorDal(contractorId);
   } catch (error) {
     return Promise.reject(error);
   }
 };
 
-export const getProjectsService = async (contractorId: string): Promise<Project[]> => {
+export const getProjectsByClientService = async (clientId: string) => {
   try {
-    return await getProjectsByContractor(contractorId);
+    return await findProjectsByClientDal(clientId);
   } catch (error) {
     return Promise.reject(error);
   }
 };
 
-export const getProjectByIdService = async (id: number, contractorId: string): Promise<Project> => {
+export const getProjectByIdService = async (id: string) => {
   try {
-    const project = await getProjectById(id, contractorId);
-    if (!project) throw new CustomError("Project not found", 404);
-    return project;
+    const item = await findProjectByIdDal(id);
+    if (!item) throw new CustomError("Project not found", 404);
+    return item;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+export const createProjectService = async (dto: CreateProjectDto) => {
+  try {
+    return await insertProjectDal(dto);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+export const updateProjectService = async (id: string, dto: UpdateProjectDto) => {
+  try {
+    const item = await updateProjectByIdDal(id, dto);
+    if (!item) throw new CustomError("Project not found", 404);
+    return item;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+export const removeProjectService = async (id: string) => {
+  try {
+    const deleted = await deleteProjectDal(id);
+    if (!deleted) throw new CustomError("Project not found", 404);
   } catch (error) {
     return Promise.reject(error);
   }

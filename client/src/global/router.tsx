@@ -3,7 +3,9 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RootRedirect from "./components/RootRedirect";
 import ProjectsPage from "../projects/pages/ProjectsPage";
+import ProjectPage from "../projects/pages/ProjectPage";
 import ClientsPage from "../clients/pages/ClientsPage";
+import ClientPage from "../clients/pages/ClientPage";
 import LoginPage from "../auth/pages/LoginPage";
 import RegisterPage from "../auth/pages/RegisterPage";
 import UsersPage from "../users/pages/UsersPage";
@@ -37,7 +39,9 @@ export const router = createBrowserRouter([
         ],
       },
       { path: "projects", element: <ProjectsPage /> },
+      { path: "projects/:id", element: <ProjectPage /> },
       { path: "clients", element: <ClientsPage /> },
+      { path: "clients/:id", element: <ClientPage /> },
     ],
   },
 ]);

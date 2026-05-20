@@ -14,13 +14,14 @@ interface Props {
 }
 
 const emptyForm: CreateClientDto = {
-  name: "",
   type: "private",
+  name: "",
   phone: "",
   email: "",
   address: "",
-  idNumber: "",
-  notes: "",
+  billingName: "",
+  billingPhone: "",
+  billingAddress: "",
 };
 
 const CreateClientModal = ({ open, onClose, onCreated }: Props) => {
@@ -120,21 +121,29 @@ const CreateClientModal = ({ open, onClose, onCreated }: Props) => {
 
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              label="מספר זהות / ח.פ"
+              label="שם לחשבונית"
               fullWidth
-              value={form.idNumber}
-              onChange={(e) => handleChange("idNumber", e.target.value)}
+              value={form.billingName}
+              onChange={(e) => handleChange("billingName", e.target.value)}
             />
           </Grid>
 
-          <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              label="הערות"
+              label="טלפון לחשבונית"
               fullWidth
               multiline
-              rows={3}
-              value={form.notes}
-              onChange={(e) => handleChange("notes", e.target.value)}
+              value={form.billingPhone}
+              onChange={(e) => handleChange("billingPhone", e.target.value)}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              label="כתובת לחשבונית"
+              fullWidth
+              multiline
+              value={form.billingAddress}
+              onChange={(e) => handleChange("billingAddress", e.target.value)}
             />
           </Grid>
         </Grid>

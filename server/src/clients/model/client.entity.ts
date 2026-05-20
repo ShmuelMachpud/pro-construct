@@ -1,43 +1,43 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { User } from "../../users/model/user.entity";
-
-export enum ClientType {
-  PRIVATE = "private",
-  BUSINESS = "business",
-}
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
+import { ClientType } from "../types/clients.types";
 
 @Entity("clients")
 export class Client {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-  @Column()
-  name: string;
+  @Column({ type: "uuid"})
+  contractorId: string;
 
   @Column({ type: "enum", enum: ClientType })
   type: ClientType;
 
   @Column()
-  phone: string;
-
-  @Column({ nullable: true })
-  email: string;
-
-  @Column({ nullable: true })
-  address: string;
-
-  @Column({ nullable: true })
-  idNumber: string;
-
-  @Column({ nullable: true })
-  notes: string;
+  name: string;
 
   @Column()
-  contractorId: string;
+  phone: string;
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: "contractorId" })
-  contractor: User;
+  @Column()
+  email: string;
+
+  @Column()
+  address: string;
+
+  @Column({ type: "varchar", nullable: true })
+  billingName: string | null;
+
+  @Column({ type: "varchar", nullable: true })
+  billingPhone: string | null;
+
+  @Column({ type: "varchar", nullable: true })
+  billingAddress: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

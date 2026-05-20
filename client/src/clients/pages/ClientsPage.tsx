@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
   Box, Button, Typography, Card, CardContent, Grid, Chip,
-  IconButton, Tooltip,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import PersonIcon from "@mui/icons-material/Person";
@@ -9,35 +8,26 @@ import BusinessIcon from "@mui/icons-material/Business";
 import PhoneIcon from "@mui/icons-material/Phone";
 import EmailIcon from "@mui/icons-material/Email";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate } from "react-router-dom";
 import type { Client } from "../types/clients.types";
-import { getClients, deleteClient } from "../services/client.service";
+import { getClients } from "../services/client.service";
 import CreateClientModal from "../components/CreateClientModal";
 import { useAuth } from "../../global/hooks/useAuth";
 
 const ClientsPage = () => {
   const { isContractor } = useAuth();
+  const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
   const [openModal, setOpenModal] = useState(false);
 
   const load = () => getClients().then(setClients);
 
-  useEffect(() => {
-    load();
-  }, []);
-
-  const handleDelete = async (id: number) => {
-    if (!window.confirm("למחוק את הלקוח?")) return;
-    await deleteClient(id);
-    load();
-  };
+  useEffect(() => { load(); }, []);
 
   return (
     <Box>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
-        <Typography variant="h5" fontWeight="bold" color="white">
-          לקוחות
-        </Typography>
+        <Typography variant="h5" fontWeight="bold" color="white">לקוחות</Typography>
         {isContractor && (
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpenModal(true)}>
             לקוח חדש
@@ -55,10 +45,12 @@ const ClientsPage = () => {
           {clients.map((client) => (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={client.id}>
               <Card
+                onClick={() => navigate(`/clients/${client.id}`)}
                 sx={{
                   backgroundColor: "#1E1E1E",
                   border: "1px solid rgba(255,107,0,0.15)",
                   borderRadius: 3,
+                  cursor: "pointer",
                   transition: "all 0.2s",
                   "&:hover": {
                     border: "1px solid rgba(255,107,0,0.5)",
@@ -74,31 +66,18 @@ const ClientsPage = () => {
                         ? <BusinessIcon sx={{ color: "primary.main", fontSize: 22 }} />
                         : <PersonIcon sx={{ color: "primary.main", fontSize: 22 }} />
                       }
-                      <Typography fontWeight="bold" color="white" fontSize="1rem">
-                        {client.name}
-                      </Typography>
+                      <Typography fontWeight="bold" color="white" fontSize="1rem">{client.name}</Typography>
                     </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                      <Chip
-                        label={client.type === "private" ? "פרטי" : "עסקי"}
-                        size="small"
-                        sx={{
-                          backgroundColor: "rgba(255,107,0,0.1)",
-                          color: "primary.main",
-                          border: "1px solid rgba(255,107,0,0.3)",
-                          fontWeight: "bold",
-                        }}
-                      />
-                      {isContractor && (
-                        <Tooltip title="מחק לקוח">
-                          <IconButton size="small" onClick={() => handleDelete(client.id)}
-                            sx={{ color: "grey.600", "&:hover": { color: "error.main" } }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </Box>
+                    <Chip
+                      label={client.type === "private" ? "פרטי" : "עסקי"}
+                      size="small"
+                      sx={{
+                        backgroundColor: "rgba(255,107,0,0.1)",
+                        color: "primary.main",
+                        border: "1px solid rgba(255,107,0,0.3)",
+                        fontWeight: "bold",
+                      }}
+                    />
                   </Box>
 
                   <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
@@ -106,14 +85,12 @@ const ClientsPage = () => {
                       <PhoneIcon sx={{ color: "grey.500", fontSize: 16 }} />
                       <Typography color="grey.400" fontSize="0.85rem">{client.phone}</Typography>
                     </Box>
-
                     {client.email && (
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <EmailIcon sx={{ color: "grey.500", fontSize: 16 }} />
                         <Typography color="grey.400" fontSize="0.85rem">{client.email}</Typography>
                       </Box>
                     )}
-
                     {client.address && (
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <LocationOnIcon sx={{ color: "grey.500", fontSize: 16 }} />
@@ -121,12 +98,6 @@ const ClientsPage = () => {
                       </Box>
                     )}
                   </Box>
-
-                  {client.notes && (
-                    <Box sx={{ mt: 2, pt: 2, borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-                      <Typography color="grey.500" fontSize="0.8rem">{client.notes}</Typography>
-                    </Box>
-                  )}
                 </CardContent>
               </Card>
             </Grid>

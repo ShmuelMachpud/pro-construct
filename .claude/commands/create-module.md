@@ -2,15 +2,18 @@ Create a new backend module following the shared microservices architecture and 
 
 ## Before creating any files, ask the user:
 
-1. **Module name** — What should the module be called? (e.g. `users`, `projects`, `clients`)
-2. **Server** — Scan the project root for directories that contain a `src/` subdirectory. Present those as the available servers and ask the user which one to add the module to.
+1. **Server** — Scan the project root for directories that contain a `src/` subdirectory. Present those as the available servers and ask the user which one to add the module to.
+2. **Module name** — What should the module be called? (user types freely — no options)
 3. **CRUD?** — Should the module include basic CRUD operations (getAll, getById, create, update, delete)?
 4. **Entity?** — Should the module include an entity file with basic fields (id, createdAt, updatedAt)?
 
 Wait for the user's answers before proceeding.
 
 Use the answers to set:
-- `MODULE` = the module name the user provided (lowercase)
+- `MODULE` = the module name the user provided (lowercase, plural — e.g. `clients`, `users`)
+- `ENTITY_SINGULAR` = singular lowercase form of the module name (e.g. `client`, `user`)
+- `ENTITY_CLASS` = PascalCase singular (e.g. `Client`, `User`)
+- `TABLE_NAME` = plural lowercase (same as `MODULE`, e.g. `clients`, `users`)
 - `SERVER` = the server directory the user selected (e.g. `server`, `auth-service`)
 - `BASE` = `<SERVER>/src/<MODULE>` — the root of all new files
 
@@ -83,7 +86,7 @@ export const getAll<MODULEs> = async (req: Request, res: Response) => {
 
 export const get<MODULE>ById = async (req: Request, res: Response) => {
   try {
-    const item = await get<MODULE>ByIdService(Number(req.params.id));
+    const item = await get<MODULE>ByIdService(req.params.id);
     res.status(200).json(item);
   } catch (error) {
     handleError(error, res);
@@ -101,7 +104,7 @@ export const create<MODULE> = async (req: Request, res: Response) => {
 
 export const update<MODULE> = async (req: Request, res: Response) => {
   try {
-    const item = await update<MODULE>Service(Number(req.params.id), req.body);
+    const item = await update<MODULE>Service(req.params.id, req.body);
     res.status(200).json(item);
   } catch (error) {
     handleError(error, res);
@@ -110,7 +113,7 @@ export const update<MODULE> = async (req: Request, res: Response) => {
 
 export const remove<MODULE> = async (req: Request, res: Response) => {
   try {
-    await remove<MODULE>Service(Number(req.params.id));
+    await remove<MODULE>Service(req.params.id);
     res.status(204).send();
   } catch (error) {
     handleError(error, res);
@@ -127,19 +130,19 @@ export const remove<MODULE> = async (req: Request, res: Response) => {
 **With CRUD:**
 ```ts
 import { CustomError } from "../../utils/customError";
-import { findAll<MODULEs>, find<MODULE>ById, insert<MODULE>, update<MODULE>ById, delete<MODULE> } from "../dal/<MODULE>.dal";
+import { findAll<MODULEs>Dal, find<MODULE>ByIdDal, insert<MODULE>Dal, update<MODULE>ByIdDal, delete<MODULE>Dal } from "../dal/<MODULE>.dal";
 
 export const getAll<MODULEs>Service = async () => {
   try {
-    return await findAll<MODULEs>();
+    return await findAll<MODULEs>Dal();
   } catch (error) {
     return Promise.reject(error);
   }
 };
 
-export const get<MODULE>ByIdService = async (id: number) => {
+export const get<MODULE>ByIdService = async (id: string) => {
   try {
-    const item = await find<MODULE>ById(id);
+    const item = await find<MODULE>ByIdDal(id);
     if (!item) throw new CustomError("<MODULE> not found", 404);
     return item;
   } catch (error) {
@@ -149,15 +152,15 @@ export const get<MODULE>ByIdService = async (id: number) => {
 
 export const create<MODULE>Service = async (dto: Create<MODULE>Dto) => {
   try {
-    return await insert<MODULE>(dto);
+    return await insert<MODULE>Dal(dto);
   } catch (error) {
     return Promise.reject(error);
   }
 };
 
-export const update<MODULE>Service = async (id: number, dto: Update<MODULE>Dto) => {
+export const update<MODULE>Service = async (id: string, dto: Update<MODULE>Dto) => {
   try {
-    const item = await update<MODULE>ById(id, dto);
+    const item = await update<MODULE>ByIdDal(id, dto);
     if (!item) throw new CustomError("<MODULE> not found", 404);
     return item;
   } catch (error) {
@@ -165,9 +168,9 @@ export const update<MODULE>Service = async (id: number, dto: Update<MODULE>Dto) 
   }
 };
 
-export const remove<MODULE>Service = async (id: number) => {
+export const remove<MODULE>Service = async (id: string) => {
   try {
-    const deleted = await delete<MODULE>(id);
+    const deleted = await delete<MODULE>Dal(id);
     if (!deleted) throw new CustomError("<MODULE> not found", 404);
   } catch (error) {
     return Promise.reject(error);
@@ -186,29 +189,30 @@ export const remove<MODULE>Service = async (id: number) => {
 **With CRUD:**
 ```ts
 import { AppDataSource } from "../../config/database";
-import { <MODULE> } from "../model/<MODULE>.entity";
+import { <ENTITY_CLASS> } from "../model/<ENTITY_SINGULAR>.entity";
+import { Create<ENTITY_CLASS>Dto, Update<ENTITY_CLASS>Dto } from "../types/<MODULE>.types";
 
-const repository = AppDataSource.getRepository(<MODULE>);
+const repository = AppDataSource.getRepository(<ENTITY_CLASS>);
 
-export const findAll<MODULEs> = async () => {
+export const findAll<MODULEs>Dal = async () => {
   return await repository.find({ order: { createdAt: "DESC" } });
 };
 
-export const find<MODULE>ById = async (id: number) => {
+export const find<MODULE>ByIdDal = async (id: string) => {
   return await repository.findOne({ where: { id } });
 };
 
-export const insert<MODULE> = async (data: Partial<<MODULE>>) => {
+export const insert<MODULE>Dal = async (data: Create<ENTITY_CLASS>Dto) => {
   const item = repository.create(data);
   return await repository.save(item);
 };
 
-export const update<MODULE>ById = async (id: number, data: Partial<<MODULE>>) => {
+export const update<MODULE>ByIdDal = async (id: string, data: Update<ENTITY_CLASS>Dto) => {
   await repository.update(id, data);
   return await repository.findOne({ where: { id } });
 };
 
-export const delete<MODULE> = async (id: number) => {
+export const delete<MODULE>Dal = async (id: string) => {
   const result = await repository.delete(id);
   return (result.affected ?? 0) > 0;
 };
@@ -237,7 +241,9 @@ export interface Update<MODULE>Dto {
 
 ---
 
-### `<BASE>/model/<MODULE>.entity.ts`
+### `<BASE>/model/<ENTITY_SINGULAR>.entity.ts`
+
+File name uses the **singular** form (e.g. `client.entity.ts`, `user.entity.ts`).
 
 **Without Entity option:** create as an empty file.
 
@@ -245,10 +251,10 @@ export interface Update<MODULE>Dto {
 ```ts
 import { Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
-@Entity()
-export class <MODULE> {
-  @PrimaryGeneratedColumn()
-  id: number;
+@Entity("<TABLE_NAME>")
+export class <ENTITY_CLASS> {
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @CreateDateColumn()
   createdAt: Date;

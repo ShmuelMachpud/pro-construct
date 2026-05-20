@@ -1,24 +1,38 @@
 import { AppDataSource } from "../../config/database";
+import { Client } from "../../clients/model/client.entity";
 import { Project } from "../model/project.entity";
+import { CreateProjectDto, UpdateProjectDto } from "../types/projects.types";
 
-const projectRepository = AppDataSource.getRepository(Project);
+const repository = AppDataSource.getRepository(Project);
 
-export const createProject = async (data: Partial<Project>): Promise<Project> => {
-  const project = projectRepository.create(data);
-  return await projectRepository.save(project);
+export const findProjectsByContractorDal = async (contractorId: string) => {
+  return await repository
+    .createQueryBuilder("project")
+    .innerJoin(Client, "client", "client.id = project.clientId")
+    .where("client.contractorId = :contractorId", { contractorId })
+    .orderBy("project.createdAt", "DESC")
+    .getMany();
 };
 
-export const getProjectsByContractor = async (contractorId: string): Promise<Project[]> => {
-  return await projectRepository.find({
-    where: { contractorId },
-    relations: ["client", "siteManager"],
-    order: { createdAt: "DESC" },
-  });
+export const findProjectsByClientDal = async (clientId: string) => {
+  return await repository.find({ where: { clientId }, order: { createdAt: "DESC" } });
 };
 
-export const getProjectById = async (id: number, contractorId: string): Promise<Project | null> => {
-  return await projectRepository.findOne({
-    where: { id, contractorId },
-    relations: ["client", "siteManager"],
-  });
+export const findProjectByIdDal = async (id: string) => {
+  return await repository.findOne({ where: { id } });
+};
+
+export const insertProjectDal = async (data: CreateProjectDto) => {
+  const item = repository.create(data);
+  return await repository.save(item);
+};
+
+export const updateProjectByIdDal = async (id: string, data: UpdateProjectDto) => {
+  await repository.update(id, data);
+  return await repository.findOne({ where: { id } });
+};
+
+export const deleteProjectDal = async (id: string) => {
+  const result = await repository.delete(id);
+  return (result.affected ?? 0) > 0;
 };

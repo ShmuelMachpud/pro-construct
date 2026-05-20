@@ -1,10 +1,10 @@
 import { Box, Typography, Chip, Button } from "@mui/material";
 import GenericModal from "../../global/components/GenericModal";
 import { roleLabel, subscriptionLabel, subscriptionColor, formatDate } from "../helpers/users.helpers";
-import type { User } from "../types/users.types";
+import type { UserInterface } from "../types/users.types";
 
 interface UserDetailsModalProps {
-  user: User | null;
+  user: UserInterface | null;
   open: boolean;
   onClose: () => void;
   onApprove: (userId: string) => void;

@@ -1,13 +1,14 @@
 import { Router, Request, Response } from "express";
-import { projectsRouter } from "../projects/routes/projects.router";
-import { clientsRouter } from "../clients/routes/clients.router";
+
 import { handleError } from "../utils/handleError";
 import { CustomError } from "../utils/customError";
+import { clientsRouter } from "../clients/routes/clients.router";
+import { projectsRouter } from "../projects/routes/projects.router";
 
 export const router = Router();
 
-router.use("/projects", projectsRouter);
 router.use("/clients", clientsRouter);
+router.use("/projects", projectsRouter);
 
 router.use((req: Request, res: Response) =>
   handleError(

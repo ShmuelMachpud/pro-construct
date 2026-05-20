@@ -1,12 +1,12 @@
 import axiosInstance from "../../global/services/axiosAuthService";
-import type { User, PendingUser } from "../types/users.types";
+import type { UserInterface } from "../types/users.types";
 
-export const getAllUsers = async (): Promise<User[]> => {
+export const getAllUsers = async (): Promise<UserInterface[]> => {
   const response = await axiosInstance.get("/users");
   return response.data;
 };
 
-export const getPendingUsers = async (): Promise<PendingUser[]> => {
+export const getPendingUsers = async (): Promise<UserInterface[]> => {
   const response = await axiosInstance.get("/users/pending");
   return response.data;
 };

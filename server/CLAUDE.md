@@ -87,8 +87,9 @@ src/
 - Entity files: `<module>.entity.ts` — e.g. `user.entity.ts`, `client.entity.ts`
 - Other file names: `<module>.<layer>.ts` — e.g. `clients.service.ts`, `projects.dal.ts`
 - Routers: export a named `const <module>Router = Router()`
-- Controllers: named functions, not default export — e.g. `export const getClientById = ...`
-- Services / DAL: named exports only, no default exports
+- Controllers: function names end with `Controller` — e.g. `export const getClientByIdController = ...`
+- Services: function names end with `Service` — e.g. `export const getClientByIdService = ...`
+- DAL: function names end with `Dal` — e.g. `export const findClientByIdDal = ...`
 
 ## Rules
 

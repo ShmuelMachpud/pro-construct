@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { getPendingUsers } from "../services/users.service";
-import type { PendingUser } from "../types/users.types";
+import type { UserInterface } from "../types/users.types";
 
 export const usePendingUsers = () => {
-  const [users, setUsers] = useState<PendingUser[]>([]);
+  const [users, setUsers] = useState<UserInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
