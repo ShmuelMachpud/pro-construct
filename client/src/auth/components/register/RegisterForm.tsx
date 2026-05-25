@@ -4,17 +4,19 @@ import PaymentForm from "../../../payment/components/PaymentForm";
 import SuccessStep from "./SuccessStep";
 
 const RegisterForm = () => {
-  const { step, plan, setPlan, registerForm, paymentForm, error, loading, handleRegister, handlePaymentSubmit } = useRegister();
+  const { step, plan, setPlan, registerForm, error, loading, handleRegister, handleCreateSubscription, handlePayPalApprove } = useRegister();
 
   if (step === "done") return <SuccessStep plan={plan} />;
 
   if (step === "payment")
     return (
       <PaymentForm
-        values={paymentForm.values}
-        setValue={paymentForm.setValue}
-        errors={paymentForm.errors}
-        onSubmit={handlePaymentSubmit}
+      onCreateSubscription={handleCreateSubscription}
+        onApprove={handlePayPalApprove}
+        // values={paymentForm.values}
+        // setValue={paymentForm.setValue}
+        // errors={paymentForm.errors}
+        // onSubmit={handlePaymentSubmit}
         loading={loading}
         error={error}
       />

@@ -9,7 +9,7 @@ export const ENV = {
     .split(",")
     .map((o) => o.trim())
     .filter(Boolean),
-  // MESHULAM_USER_ID: process.env.MESHULAM_USER_ID || "",
-  // MESHULAM_PAGE_CODE: process.env.MESHULAM_PAGE_CODE || "",
-  // APP_BASE_URL: process.env.APP_BASE_URL || "http://localhost:3000",
+PAYPAL_BASE_URL: process.env.PAYPAL_BASE_URL!,
+PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID!,
+PAYPAL_CLIENT_SECRET: process.env.PAYPAL_CLIENT_SECRET!,
 };

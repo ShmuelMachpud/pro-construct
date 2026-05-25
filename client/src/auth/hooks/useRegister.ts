@@ -1,10 +1,17 @@
 import { useState } from "react";
 import { register } from "../services/auth.service";
 import { useForm } from "../../global/hooks/useForm";
-import { registerInitialData, registerSchema } from "../helpers/register.helpers";
-import { paymentInitialData, paymentSchema } from "../../payment/helpers/payment.helpers";
+import {
+  registerInitialData,
+  registerSchema,
+} from "../helpers/register.helpers";
+// import {
+//   paymentInitialData,
+//   paymentSchema,
+// } from "../../payment/helpers/payment.helpers";
 import type { RegisterFormType, RegisterPlan } from "../types/auth.types";
-import type { PaymentFormType } from "../../payment/types/payment.types";
+// import type { PaymentFormType } from "../../payment/types/payment.types";
+import { createSubscription } from "../../paypal/services/paypal.service";
 
 type Step = "register" | "payment" | "done";
 
@@ -15,20 +22,39 @@ export const useRegister = () => {
   const [loading, setLoading] = useState(false);
 
   const registerForm = useForm<RegisterFormType>(registerInitialData);
-  const paymentForm = useForm<PaymentFormType>(paymentInitialData);
+  // const paymentForm = useForm<PaymentFormType>(paymentInitialData);
 
   const handleRegister = () => {
     if (!registerForm.validate(registerSchema)) return;
     setStep("payment");
   };
 
-  const handlePaymentSubmit = async () => {
-    if (!paymentForm.validate(paymentSchema)) return;
+  // const handlePaymentSubmit = async () => {
+  //   if (!paymentForm.validate(paymentSchema)) return;
 
+  //   setError("");
+  //   setLoading(true);
+  //   try {
+  //     await register(registerForm.values, plan, paymentForm.values.cardNumber);
+  //     setStep("done");
+  //   } catch {
+  //     setError("ההרשמה נכשלה. נסה שנית.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const handleCreateSubscription = async () => {
+    const interval = plan === "monthly" ? "MONTH" : "YEAR";
+    const subscriptionId = await createSubscription(interval);
+    return subscriptionId;
+  };
+
+  const handlePayPalApprove = async (subscriptionId: string) => {
     setError("");
     setLoading(true);
     try {
-      await register(registerForm.values, plan, paymentForm.values.cardNumber);
+      await register(registerForm.values, plan, subscriptionId);
       setStep("done");
     } catch {
       setError("ההרשמה נכשלה. נסה שנית.");
@@ -42,10 +68,12 @@ export const useRegister = () => {
     plan,
     setPlan,
     registerForm,
-    paymentForm,
+    // paymentForm,
     error,
     loading,
     handleRegister,
-    handlePaymentSubmit,
+    // handlePaymentSubmit,
+    handleCreateSubscription,
+    handlePayPalApprove,
   };
 };
