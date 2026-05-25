@@ -4,11 +4,13 @@ import { handleError } from "../utils/handleError";
 import { CustomError } from "../utils/customError";
 import { clientsRouter } from "../clients/routes/clients.router";
 import { projectsRouter } from "../projects/routes/projects.router";
+import { paypalRouter } from "../paypal/routes/paypal.router";
 
 export const router = Router();
 
 router.use("/clients", clientsRouter);
 router.use("/projects", projectsRouter);
+router.use("/paypal", paypalRouter);
 
 router.use((req: Request, res: Response) =>
   handleError(
