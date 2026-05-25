@@ -6,7 +6,7 @@ export const login = async (email: string, password: string) => {
   return response.data;
 };
 
-export const register = async (values: RegisterFormType, plan: RegisterPlan, mockCardNumber: string) => {
+export const register = async (values: RegisterFormType, plan: RegisterPlan, cardNumber: string) => {
   const response = await axiosInstance.post("/auth/register", {
     name: values.name,
     email: values.email,
@@ -16,7 +16,7 @@ export const register = async (values: RegisterFormType, plan: RegisterPlan, moc
     companyName: values.companyName || undefined,
     companyId: values.companyId || undefined,
     address: values.address || undefined,
-    mockCardNumber,
+    mockCardNumber: cardNumber,
   });
   return response.data;
 };

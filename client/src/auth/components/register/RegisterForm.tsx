@@ -1,6 +1,6 @@
 import { useRegister } from "../../hooks/useRegister";
 import RegistrationStep from "./RegistrationStep";
-import PaymentStep from "./PaymentStep";
+import PaymentForm from "../../../payment/components/PaymentForm";
 import SuccessStep from "./SuccessStep";
 
 const RegisterForm = () => {
@@ -10,7 +10,7 @@ const RegisterForm = () => {
 
   if (step === "payment")
     return (
-      <PaymentStep
+      <PaymentForm
         values={paymentForm.values}
         setValue={paymentForm.setValue}
         errors={paymentForm.errors}

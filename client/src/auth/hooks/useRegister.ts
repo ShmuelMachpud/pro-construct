@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { register } from "../services/auth.service";
 import { useForm } from "../../global/hooks/useForm";
-import { registerInitialData, paymentInitialData, registerSchema, paymentSchema } from "../helpers/register.helpers";
-import type { RegisterFormType, PaymentFormType, RegisterPlan } from "../types/auth.types";
+import { registerInitialData, registerSchema } from "../helpers/register.helpers";
+import { paymentInitialData, paymentSchema } from "../../payment/helpers/payment.helpers";
+import type { RegisterFormType, RegisterPlan } from "../types/auth.types";
+import type { PaymentFormType } from "../../payment/types/payment.types";
 
 type Step = "register" | "payment" | "done";
 
@@ -26,7 +28,7 @@ export const useRegister = () => {
     setError("");
     setLoading(true);
     try {
-      await register(registerForm.values, plan, paymentForm.values.mockCardNumber);
+      await register(registerForm.values, plan, paymentForm.values.cardNumber);
       setStep("done");
     } catch {
       setError("ההרשמה נכשלה. נסה שנית.");
