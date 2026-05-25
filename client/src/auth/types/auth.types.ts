@@ -14,8 +14,4 @@ export type RegisterFormType = {
   address: string;
 };
 
-export type PaymentFormType = {
-  mockCardNumber: string;
-};
-
 export type RegisterPlan = "monthly" | "annual";

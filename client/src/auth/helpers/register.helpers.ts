@@ -1,6 +1,6 @@
 import Joi from "joi";
 import type { FieldConfig } from "../../global/components/GenericForm";
-import type { RegisterFormType, PaymentFormType } from "../types/auth.types";
+import type { RegisterFormType } from "../types/auth.types";
 
 export const registerSchema = Joi.object<RegisterFormType>({
   name: Joi.string().required().messages({ "string.empty": "שם מלא הוא שדה חובה", "any.required": "שם מלא הוא שדה חובה" }),
@@ -36,25 +36,6 @@ export const registerInitialData: RegisterFormType = {
   address: "",
 };
 
-export const paymentSchema = Joi.object<PaymentFormType>({
-  mockCardNumber: Joi.string().min(4).required().messages({
-    "string.empty": "מספר כרטיס הוא שדה חובה",
-    "string.min": "מספר כרטיס לא תקין",
-    "any.required": "מספר כרטיס הוא שדה חובה",
-  }),
-});
-
-export const paymentInitialData: PaymentFormType = {
-  mockCardNumber: "",
-};
-
-export const getPaymentFormInfo = (
-  values: PaymentFormType,
-  setValue: (key: keyof PaymentFormType, value: string) => void,
-  errors: Partial<Record<keyof PaymentFormType, string>> = {}
-): FieldConfig[] => [
-  { name: "mockCardNumber", label: "מספר כרטיס (לצורך פיתוח)", type: "text", value: values.mockCardNumber, onChange: (v) => setValue("mockCardNumber", v), error: errors.mockCardNumber },
-];
 
 export const getRegisterFormInfo = (
   values: RegisterFormType,
