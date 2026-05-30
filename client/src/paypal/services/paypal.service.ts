@@ -1,4 +1,4 @@
-import axiosInstance from "../../global/services/axios";
+import axiosInstance from "../../global/services/axiosServer";
 
 export const createSubscription = async (
   interval: "MONTH" | "YEAR",

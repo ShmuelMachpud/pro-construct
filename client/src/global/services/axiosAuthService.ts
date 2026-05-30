@@ -1,7 +1,8 @@
 import axios from "axios";
+import { ENV } from "../config/environments";
 
 const axiosAuthService = axios.create({
-  baseURL: "http://localhost:3001/api",
+  baseURL: `${ENV.AUTH_SERVICE_URL}/api`,
 });
 
 axiosAuthService.interceptors.request.use((config) => {

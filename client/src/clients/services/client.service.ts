@@ -1,4 +1,4 @@
-import axiosInstance from "../../global/services/axios";
+import axiosInstance from "../../global/services/axiosServer";
 import type { Client, CreateClientDto } from "../types/clients.types";
 
 export type { Client, CreateClientDto };
@@ -13,7 +13,10 @@ export const createClient = async (dto: CreateClientDto): Promise<Client> => {
   return data;
 };
 
-export const updateClient = async (id: string, dto: Partial<CreateClientDto>): Promise<Client> => {
+export const updateClient = async (
+  id: string,
+  dto: Partial<CreateClientDto>,
+): Promise<Client> => {
   const { data } = await axiosInstance.put(`/clients/${id}`, dto);
   return data;
 };
