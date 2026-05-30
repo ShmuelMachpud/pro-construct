@@ -9,7 +9,12 @@ export const ENV = {
     .split(",")
     .map((o) => o.trim())
     .filter(Boolean),
-PAYPAL_BASE_URL: process.env.PAYPAL_BASE_URL!,
-PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID!,
-PAYPAL_CLIENT_SECRET: process.env.PAYPAL_CLIENT_SECRET!,
+};
+
+export const ENV_PAYPAL = {
+  BASE_URL: process.env.PAYPAL_BASE_URL!,
+  CLIENT_ID: process.env.PAYPAL_CLIENT_ID!,
+  CLIENT_SECRET: process.env.PAYPAL_CLIENT_SECRET!,
+  MONTHLY_PLAN_ID: process.env.PAYPAL_MONTHLY_PLAN_ID!,
+  YEARLY_PLAN_ID: process.env.PAYPAL_YEARLY_PLAN_ID!,
 };

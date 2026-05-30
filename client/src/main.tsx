@@ -8,6 +8,7 @@ import rtlPlugin from "stylis-plugin-rtl";
 import { theme } from "./global/theme";
 import App from "./App";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+import { ENV } from "./global/config/environments";
 
 
 const cacheRtl = createCache({
@@ -20,13 +21,12 @@ createRoot(document.getElementById("root")!).render(
     <CacheProvider value={cacheRtl}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-                <PayPalScriptProvider options={{
-          clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
+          <PayPalScriptProvider options={{
+          clientId: ENV.PAYPAL_CLIENT_ID,
           vault: true,
           intent: "subscription",
         }}>
-
-        <App />
+          <App />
         </PayPalScriptProvider>
       </ThemeProvider>
     </CacheProvider>

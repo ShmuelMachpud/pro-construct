@@ -1,9 +1,9 @@
 import axios from "axios";
-import { ENV } from "../../config/environments";
+import { ENV_PAYPAL } from "../../config/environments";
 
 let cachedToken: string | null = null;
 let tokenExpiry: number | null = null;
-const { PAYPAL_BASE_URL, PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = ENV;
+const { BASE_URL, CLIENT_ID, CLIENT_SECRET } = ENV_PAYPAL;
 
 const getAccessTokenService = async (): Promise<string> => {
   if (cachedToken && tokenExpiry && Date.now() < tokenExpiry) {
@@ -11,12 +11,12 @@ const getAccessTokenService = async (): Promise<string> => {
   }
 
   const response = await axios.post(
-    `${PAYPAL_BASE_URL}/v1/oauth2/token`,
+    `${BASE_URL}/v1/oauth2/token`,
     "grant_type=client_credentials",
     {
       auth: {
-        username: PAYPAL_CLIENT_ID,
-        password: PAYPAL_CLIENT_SECRET,
+        username: CLIENT_ID,
+        password: CLIENT_SECRET,
       },
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -36,7 +36,7 @@ export const createSubscriptionService = async (
   const accessToken = await getAccessTokenService();
 
   const response = await axios.post(
-    `${PAYPAL_BASE_URL}/v1/billing/subscriptions`,
+    `${BASE_URL}/v1/billing/subscriptions`,
     {
       plan_id: planId,
       application_context: {
