@@ -4,6 +4,7 @@ import {
   findProjectsByContractorDal,
   findProjectsByClientDal,
   findProjectByIdDal,
+  findProjectByIdAndContractorDal,
   insertProjectDal,
   updateProjectByIdDal,
   deleteProjectDal,
@@ -28,6 +29,19 @@ export const getProjectsByClientService = async (clientId: string) => {
 export const getProjectByIdService = async (id: string) => {
   try {
     const item = await findProjectByIdDal(id);
+    if (!item) throw new CustomError("Project not found", 404);
+    return item;
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+export const getProjectByIdAndContractorService = async (
+  id: string,
+  contractorId: string,
+) => {
+  try {
+    const item = await findProjectByIdAndContractorDal(id, contractorId);
     if (!item) throw new CustomError("Project not found", 404);
     return item;
   } catch (error) {

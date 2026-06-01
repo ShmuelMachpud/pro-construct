@@ -9,6 +9,10 @@ import ClientPage from "../clients/pages/ClientPage";
 import LoginPage from "../auth/pages/LoginPage";
 import RegisterPage from "../auth/pages/RegisterPage";
 import UsersPage from "../users/pages/UsersPage";
+import MaterialsPage from "../materials/pages/MaterialsPage";
+import MyMaterialsPage from "../materials/pages/MyMaterialsPage";
+import QuotesPage from "../quotes/pages/QuotesPage";
+import QuotePage from "../quotes/pages/QuotePage";
 
 export const router = createBrowserRouter([
   {
@@ -36,8 +40,12 @@ export const router = createBrowserRouter([
         ),
         children: [
           { path: "users", element: <UsersPage /> },
+          { path: "materials", element: <MaterialsPage /> },
         ],
       },
+      { path: "my-materials", element: <MyMaterialsPage /> },
+      { path: "quotes", element: <QuotesPage /> },
+      { path: "quotes/:projectId", element: <QuotePage /> },
       { path: "projects", element: <ProjectsPage /> },
       { path: "projects/:id", element: <ProjectPage /> },
       { path: "clients", element: <ClientsPage /> },
