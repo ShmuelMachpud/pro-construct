@@ -22,6 +22,18 @@ export const findProjectByIdDal = async (id: string) => {
   return await repository.findOne({ where: { id } });
 };
 
+export const findProjectByIdAndContractorDal = async (
+  id: string,
+  contractorId: string,
+) => {
+  return await repository
+    .createQueryBuilder("project")
+    .innerJoin(Client, "client", "client.id = project.clientId")
+    .where("project.id = :id", { id })
+    .andWhere("client.contractorId = :contractorId", { contractorId })
+    .getOne();
+};
+
 export const insertProjectDal = async (data: CreateProjectDto) => {
   const item = repository.create(data);
   return await repository.save(item);
