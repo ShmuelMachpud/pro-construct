@@ -1,0 +1,53 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dev: auth-service",
+      "type": "shell",
+      "command": "cd ./auth-service && npm i && npm run dev",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "starting|compiling",
+          "endsPattern": "Server running on port"
+        }
+      },
+    },
+    {
+      "label": "dev: server",
+      "type": "shell",
+      "command": "cd ./server && npm i && npm run dev",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "starting|compiling",
+          "endsPattern": "Server running on port"
+        }
+      },
+    },
+    {
+      "label": "dev: client",
+      "type": "shell",
+      "command": "cd ./client && npm i && npm run dev",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "starting|compiling",
+          "endsPattern": "➜  Local:"
+        }
+      },
+    },
+    {
+      "label": "dev: all",
+      "dependsOn": ["dev: auth-service", "dev: server", "dev: client"],
+      "dependsOrder": "parallel",
+      "group": { "kind": "build", "isDefault": true }
+    }
+  ]
+}
