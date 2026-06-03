@@ -9,6 +9,7 @@ interface UserDetailsModalProps {
   onClose: () => void;
   onApprove: (userId: string) => void;
   approving: boolean;
+  canApprove: boolean;
 }
 
 const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
@@ -18,7 +19,7 @@ const Field = ({ label, children }: { label: string; children: React.ReactNode }
   </Box>
 );
 
-const UserDetailsModal = ({ user, open, onClose, onApprove, approving }: UserDetailsModalProps) => {
+const UserDetailsModal = ({ user, open, onClose, onApprove, approving, canApprove }: UserDetailsModalProps) => {
   if (!user) return null;
 
   return (
@@ -27,7 +28,7 @@ const UserDetailsModal = ({ user, open, onClose, onApprove, approving }: UserDet
       onClose={onClose}
       title="פרטי משתמש"
       actions={
-        !user.isApproved ? (
+        canApprove && !user.isApproved ? (
           <Button variant="contained" onClick={() => onApprove(user.id)} disabled={approving} sx={{ minWidth: 120 }}>
             {approving ? "מאשר..." : "אשר משתמש"}
           </Button>

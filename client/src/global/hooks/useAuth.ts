@@ -27,6 +27,7 @@ export const useAuth = () => {
   return {
     user,
     isAdmin: user?.role === "admin",
+    isOperator: user?.role === "operator",
     isContractor: user?.role === "contractor",
   };
 };

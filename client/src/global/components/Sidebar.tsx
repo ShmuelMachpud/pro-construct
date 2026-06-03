@@ -11,9 +11,9 @@ import { useAuth } from "../hooks/useAuth";
 const DRAWER_WIDTH = 240;
 
 const adminMenuItems = [
+  { label: "דשבורד", icon: <BarChartIcon />, path: "/dashboard" },
   { label: "משתמשים", icon: <PeopleIcon />, path: "/users" },
   { label: "ניהול חומרים", icon: <InventoryIcon />, path: "/materials" },
-  { label: "סטטיסטיקות", icon: <BarChartIcon />, path: "/statistics" },
 ];
 
 const contractorMenuItems = [
@@ -26,9 +26,9 @@ const contractorMenuItems = [
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isOperator } = useAuth();
 
-  const menuItems = isAdmin ? adminMenuItems : contractorMenuItems;
+  const menuItems = isAdmin || isOperator ? adminMenuItems : contractorMenuItems;
 
   return (
     <Box

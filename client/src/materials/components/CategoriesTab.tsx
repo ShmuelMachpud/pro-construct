@@ -10,7 +10,7 @@ import { useCategories } from "../hooks/useCategories";
 import type { MaterialCategory } from "../types/materials.types";
 
 const CategoriesTab = () => {
-  const { categories, loading, error, handleCreate, handleUpdate, handleDelete } = useCategories();
+  const { categories, loading, error, handleCreate, handleUpdate, handleDelete, isAdmin: canEdit } = useCategories();
   const [modalOpen, setModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<MaterialCategory | null>(null);
   const [deleteItem, setDeleteItem] = useState<MaterialCategory | null>(null);
@@ -43,24 +43,26 @@ const CategoriesTab = () => {
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => { setEditItem(null); setModalOpen(true); }}
-        >
-          קטגוריה חדשה
-        </Button>
-      </Box>
+      {canEdit && (
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => { setEditItem(null); setModalOpen(true); }}
+          >
+            קטגוריה חדשה
+          </Button>
+        </Box>
+      )}
 
       {!loading && categories.length === 0 ? (
         <Box sx={{ textAlign: "center", mt: 8, color: "grey.600" }}>
           <CategoryIcon sx={{ fontSize: 56, mb: 1.5 }} />
-          <Typography>אין קטגוריות עדיין. הוסף קטגוריה ראשונה.</Typography>
+          <Typography>אין קטגוריות עדיין.</Typography>
         </Box>
       ) : (
         <GenericTable<MaterialCategory>
-          columns={getCategoryColumns(handleEdit, handleDeleteClick)}
+          columns={getCategoryColumns(handleEdit, handleDeleteClick, canEdit)}
           rows={categories}
           loading={loading}
           emptyMessage="אין קטגוריות"

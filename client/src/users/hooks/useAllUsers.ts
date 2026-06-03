@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { getAllUsers } from "../services/users.service";
 import type { UserInterface } from "../types/users.types";
+import { useAuth } from "../../global/hooks/useAuth";
 
 export const useAllUsers = () => {
+  const { isAdmin } = useAuth();
   const [users, setUsers] = useState<UserInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -19,5 +21,5 @@ export const useAllUsers = () => {
       prev.map((u) => (u.id === userId ? { ...u, isApproved: true } : u)),
     );
 
-  return { users, loading, error, approveUserLocally };
+  return { users, loading, error, approveUserLocally, isAdmin };
 };

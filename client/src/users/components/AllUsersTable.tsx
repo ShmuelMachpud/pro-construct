@@ -6,9 +6,8 @@ import { useApproveUser } from "../hooks/useApproveUser";
 import UserDetailsModal from "./UserDetailsModal";
 import { allUsersColumns } from "../helpers/users.columns";
 import type { UserInterface } from "../types/users.types";
-
 const AllUsersTable = () => {
-  const { users, loading, error, approveUserLocally } = useAllUsers();
+  const { users, loading, error, approveUserLocally, isAdmin } = useAllUsers();
   const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
 
   const { approve, loading: approving } = useApproveUser((userId) => {
@@ -33,6 +32,7 @@ const AllUsersTable = () => {
         onClose={() => setSelectedUser(null)}
         onApprove={approve}
         approving={approving}
+        canApprove={isAdmin}
       />
     </>
   );

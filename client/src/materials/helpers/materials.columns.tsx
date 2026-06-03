@@ -38,30 +38,38 @@ const ActionsCell = <T extends object>({
 export const getCategoryColumns = (
   onEdit: (row: MaterialCategory) => void,
   onDelete: (row: MaterialCategory) => void,
-): ColumnDef<MaterialCategory>[] => [
-  { key: "name", label: "שם קטגוריה" },
-  { key: "description", label: "תיאור", render: (row) => row.description ?? "—" },
-  {
+  canEdit = true,
+): ColumnDef<MaterialCategory>[] => {
+  const base: ColumnDef<MaterialCategory>[] = [
+    { key: "name", label: "שם קטגוריה" },
+    { key: "description", label: "תיאור", render: (row) => row.description ?? "—" },
+  ];
+  if (!canEdit) return base;
+  return [...base, {
     key: "id",
     label: "פעולות",
     render: (row) => <ActionsCell row={row} onEdit={onEdit} onDelete={onDelete} />,
-  },
-];
+  }];
+};
 
 export const getGlobalMaterialColumns = (
   onEdit: (row: GlobalMaterial) => void,
   onDelete: (row: GlobalMaterial) => void,
-): ColumnDef<GlobalMaterial>[] => [
-  { key: "name", label: "שם חומר" },
-  { key: "category", label: "קטגוריה", render: (row) => row.category.name },
-  { key: "unit", label: "יחידת מידה" },
-  { key: "description", label: "תיאור", render: (row) => row.description ?? "—" },
-  {
+  canEdit = true,
+): ColumnDef<GlobalMaterial>[] => {
+  const base: ColumnDef<GlobalMaterial>[] = [
+    { key: "name", label: "שם חומר" },
+    { key: "category", label: "קטגוריה", render: (row) => row.category.name },
+    { key: "unit", label: "יחידת מידה" },
+    { key: "description", label: "תיאור", render: (row) => row.description ?? "—" },
+  ];
+  if (!canEdit) return base;
+  return [...base, {
     key: "id",
     label: "פעולות",
     render: (row) => <ActionsCell row={row} onEdit={onEdit} onDelete={onDelete} />,
-  },
-];
+  }];
+};
 
 export const getContractorMaterialColumns = (
   onEdit: (row: ContractorMaterial) => void,
