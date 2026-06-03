@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authenticate, authorize } from "../../middleware/auth.middleware";
+import { UserRole } from "../../types/auth.types";
 import {
   getAllMaterialCategoriesController,
   getMaterialCategoryByIdController,
@@ -16,16 +17,16 @@ materialCategoriesRouter.get("/", getAllMaterialCategoriesController);
 materialCategoriesRouter.get("/:id", getMaterialCategoryByIdController);
 materialCategoriesRouter.post(
   "/",
-  authorize("admin"),
+  authorize(UserRole.ADMIN),
   createMaterialCategoryController,
 );
 materialCategoriesRouter.put(
   "/:id",
-  authorize("admin"),
+  authorize(UserRole.ADMIN),
   updateMaterialCategoryController,
 );
 materialCategoriesRouter.delete(
   "/:id",
-  authorize("admin"),
+  authorize(UserRole.ADMIN),
   removeMaterialCategoryController,
 );

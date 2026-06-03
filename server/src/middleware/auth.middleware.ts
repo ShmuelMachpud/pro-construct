@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { ENV } from "../config/environments";
-import { AuthPayload, AuthRequest } from "../types/auth.types";
+import { AuthPayload, AuthRequest, UserRole } from "../types/auth.types";
 import { logger } from "../utils/logger";
 
 export const authenticate = (
@@ -27,7 +27,7 @@ export const authenticate = (
   }
 };
 
-export const authorize = (...roles: string[]) => {
+export const authorize = (...roles: UserRole[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
       logger.warn(

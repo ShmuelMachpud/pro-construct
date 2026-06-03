@@ -41,9 +41,5 @@ export const normalizedUser = (user: User) => ({
   createdAt: user.createdAt,
 });
 
-export const normalizedUsers = (users: User[]) => {
-  const normalizeUsers: UserForClient[] = users.map((user) =>
-    normalizedUser(user),
-  );
-  return normalizeUsers;
-};
+export const normalizedUsers = (users: User[]): UserForClient[] =>
+  users.map(normalizedUser);
