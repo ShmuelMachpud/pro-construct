@@ -33,10 +33,6 @@ export const getClientByIdController = async (req: AuthRequest, res: Response) =
 export const createClientController = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.id;
-    if (!userId) {
-      res.status(401).json({ message: "Unauthorized" });
-      return;
-    }
     const item = await createClientService(req.body, userId);
     res.status(201).json(item);
   } catch (error) {

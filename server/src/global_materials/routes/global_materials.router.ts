@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authenticate, authorize } from "../../middleware/auth.middleware";
+import { UserRole } from "../../types/auth.types";
 import {
   getAllGlobalMaterialsController,
   getGlobalMaterialsByCategoryController,
@@ -21,16 +22,16 @@ globalMaterialsRouter.get(
 globalMaterialsRouter.get("/:id", getGlobalMaterialByIdController);
 globalMaterialsRouter.post(
   "/",
-  authorize("admin"),
+  authorize(UserRole.ADMIN),
   createGlobalMaterialController,
 );
 globalMaterialsRouter.put(
   "/:id",
-  authorize("admin"),
+  authorize(UserRole.ADMIN),
   updateGlobalMaterialController,
 );
 globalMaterialsRouter.delete(
   "/:id",
-  authorize("admin"),
+  authorize(UserRole.ADMIN),
   removeGlobalMaterialController,
 );

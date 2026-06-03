@@ -1,8 +1,21 @@
-# Shared Microservices Documentation
+# ProConstruct — Codebase Documentation
+
+## Repository Layout
+
+```
+pro-construct/
+├── auth-service/   ← standalone auth microservice (users, login, registration, approval)
+├── server/         ← main API server (clients, projects, materials, quotes, paypal)
+└── client/         ← React frontend (Vite + MUI v7 + React Router v7)
+```
+
+---
+
+# Backend Services (auth-service & server)
 
 ## Stack
 
-Express.js + TypeScript
+Express.js + TypeScript + TypeORM + PostgreSQL
 
 ---
 
@@ -15,20 +28,33 @@ The main entry point registers all global middleware (CORS, body parsing, router
 - **DB connection succeeds** → server starts listening, logs success
 - **DB connection fails** → logs the error, process exits
 
+Middleware order — keep it exactly as:
+
+```ts
+app.use(corsMiddleware);
+app.use(requestLogger);
+app.use(express.json());
+app.use("/api", router);
+app.use(handleServerError);   // last — global error safety net
+```
+
 ### Directory Structure
 
 ```
 src/
 ├── index.ts               ← app bootstrap: middleware registration, DB init, server start
 ├── config/
-│   ├── environment.ts     ← reads and exports env vars (PORT, DB_URL, etc.)
+│   ├── environment(s).ts  ← reads and exports env vars (PORT, DB_URL, etc.) — never use process.env elsewhere
 │   └── database.ts        ← DB connection / DataSource (initialized once, imported by DALs)
 ├── middleware/
+│   ├── auth.middleware.ts          ← authenticate, authorize
 │   ├── cors.middleware.ts          ← CORS configuration
 │   ├── requestLogger.middleware.ts ← logs method, path, status, duration
 │   └── handleServerError.middleware.ts ← Express 4-param error handler
 ├── routes/
 │   └── index.ts           ← central router: mounts all module routers + 404 catch-all
+├── types/
+│   └── auth.types.ts      ← AuthPayload, AuthRequest, UserRole enum
 ├── utils/
 │   ├── logger.ts          ← application logger
 │   ├── customError.ts     ← CustomError class
@@ -42,21 +68,6 @@ src/
     ├── dal/
     ├── helpers/
     └── types/
-```
-
-### Module Structure
-
-Each domain is a self-contained module under `src/`:
-
-```
-<module>/
-├── model/           ← entity / schema (e.g. user.entity.ts)
-├── routes/          ← express router, endpoint definitions
-├── controllers/     ← request/response handling
-├── services/        ← orchestration, delegates logic to helpers
-├── dal/             ← data source communication
-├── helpers/         ← business logic and normalization for this module
-└── types/           ← TypeScript types and interfaces
 ```
 
 ### Layer Responsibilities
@@ -128,7 +139,7 @@ if (!token) return Promise.reject(new CustomError("Unauthorized", 401));
 ### Exports & Naming
 
 - **Named exports only** — no default exports in any file
-- **No magic strings or numbers** — use enums or named constants
+- **No magic strings or numbers** — use enums or named constants (`UserRole.ADMIN` not `"admin"`)
 - **Descriptive names** — no generic names like `data`, `temp`, `result`, `res` (outside of Express handler signatures)
 - **Layer suffix in function names** — controller functions end with `Controller`, service functions end with `Service`, DAL functions end with `Dal`
 
@@ -139,10 +150,94 @@ if (!token) return Promise.reject(new CustomError("Unauthorized", 401));
 
 ### HTTP
 
-- Consistent status codes: `200` GET/PUT, `201` POST, `204` DELETE (no body)
+- Consistent status codes: `200` GET/PUT/PATCH, `201` POST, `204` DELETE (no body)
 - All error responses return `{ message: string }`
 - All success responses return the full entity, not just the `id`
 
 ### Environment Variables
 
-- Access env vars only through `config/environment.ts` — never use `process.env` directly anywhere else
+- Access env vars only through `config/environment(s).ts` — never use `process.env` directly anywhere else
+
+---
+
+# Client (React Frontend)
+
+## Stack
+
+React 19 + TypeScript + Vite + Material-UI v7 + React Router v7
+
+## File Structure
+
+```
+src/
+├── global/
+│   ├── components/         ← reusable generic components (GenericForm, GenericPage, GenericTable, GenericModal)
+│   ├── hooks/              ← reusable hooks shared across modules (useAuth, useForm)
+│   ├── services/           ← axios instance with JWT interceptors
+│   ├── router.tsx          ← React Router v7 setup; wraps private routes in ProtectedRoute
+│   └── theme.ts            ← Material-UI v7 theme with RTL (stylis-plugin-rtl)
+└── <module>/               ← e.g. auth/, users/, clients/, projects/, billing/
+    ├── pages/              ← one root component per route (no logic)
+    ├── components/         ← module-specific components (call hooks, render UI)
+    │   └── <feature>/      ← sub-folder when a feature has multiple related components
+    ├── hooks/              ← all data/logic per feature (use<Feature>.ts)
+    ├── helpers/            ← form field configs, column definitions, label/color maps, style constants, pure utils
+    ├── services/           ← API call functions only (no state)
+    └── types/              ← TypeScript types for this module
+```
+
+## Component Rules
+
+1. **Page** = single route root — renders layout and composes components, zero logic.
+2. **Logic, data fetching, normalization, service calls** belong exclusively in hooks.
+3. **Generic components** in `global/components/` — no business-domain props, named `Generic<Name>`.
+4. Components never call services or use `useState`/`useEffect` for data fetching — that belongs in hooks.
+
+## `useForm` — Generic Form Hook
+
+```ts
+const { values, setValue, errors, validate, reset } = useForm<MyFormType>(initialData);
+```
+
+## `GenericForm` — Config-Driven Form Component
+
+```tsx
+<GenericForm
+  title="..." subtitle="..." icon={<Icon />}
+  infoForm={getFormInfo(values, setValue)}
+  onSubmit={handler} submitLabel="..." loading={...} error={...}
+/>
+```
+
+## `GenericPage` — Full-Screen Background Page Wrapper
+
+```tsx
+<GenericPage>          // uses /proconstruct.jpg as default background
+<GenericPage backgroundImage="/other.jpg">
+```
+
+## Form Pattern — Per Feature
+
+```
+<module>/
+├── types/<module>.types.ts        ← XxxFormType (exported)
+├── helpers/<feature>.helpers.ts   ← initialData + getFormInfo()
+├── hooks/use<Feature>.ts          ← useForm<XxxFormType> + service call + validation
+├── components/<Feature>Form.tsx   ← GenericForm + hook + helpers
+└── pages/<Feature>Page.tsx        ← background/layout + <FeatureForm />
+```
+
+## Naming Conventions
+
+| Item | Pattern | Example |
+|------|---------|---------|
+| Pages | `<Feature>Page.tsx` | `LoginPage.tsx` |
+| Components | `<Feature>.tsx` | `LoginForm.tsx` |
+| Generic components | `Generic<Name>.tsx` | `GenericForm.tsx` |
+| Hooks | `use<Feature>.ts` | `useLogin.ts` |
+| Services | `<module>.service.ts` | `auth.service.ts` |
+| Types | `<module>.types.ts` | `auth.types.ts` |
+| Type names | `<Feature>FormType` | `LoginFormType` |
+| Helpers (forms) | `<feature>.helpers.ts` | `register.helpers.ts` |
+| Initial data | `<feature>InitialData` | `loginInitialData` |
+| Form info fn | `get<Feature>FormInfo` | `getLoginFormInfo` |

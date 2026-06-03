@@ -4,9 +4,11 @@ import { logger } from "./logger";
 
 export const handleError = (error: unknown, res: Response) => {
   if (error instanceof CustomError) {
+    logger.error(`${error.status} - ${error.message}`);
     res.status(error.status).json({ message: error.message });
-  } else {
-    logger.error(error instanceof Error ? error.message : String(error));
-    res.status(500).json({ message: "Internal server error" });
+    return;
   }
+  const message = error instanceof Error ? error.message : String(error);
+  logger.error(`500 - ${message}`);
+  res.status(500).json({ message: "Internal server error" });
 };
