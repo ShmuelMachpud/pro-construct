@@ -1,28 +1,58 @@
 import type { Project } from "../../projects/types/projects.types";
-import type { ContractorMaterial } from "../../materials/types/materials.types";
 
-export interface ProjectMaterial {
+export type QuoteStatus = "DRAFT" | "SENT" | "APPROVED" | "REJECTED" | "EXPIRED";
+export type QuoteItemType = "MATERIAL" | "LABOR" | "OTHER";
+
+export interface PriceQuote {
   id: number;
   projectId: string;
-  contractorMaterialId: number;
-  contractorMaterial: ContractorMaterial;
-  quantity: number;
+  title: string;
+  status: QuoteStatus;
+  validUntil: string | null;
   notes: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface AddProjectMaterialDto {
-  contractorMaterialId: number;
+export interface QuoteItem {
+  id: number;
+  quoteId: number;
+  type: QuoteItemType;
+  sourceId: number | null;
+  description: string;
   quantity: number;
+  unitPrice: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePriceQuoteDto {
+  title: string;
+  validUntil?: string;
   notes?: string;
 }
 
-export interface UpdateProjectMaterialDto {
+export interface UpdatePriceQuoteDto {
+  title?: string;
+  status?: QuoteStatus;
+  validUntil?: string | null;
+  notes?: string | null;
+}
+
+export interface CreateQuoteItemDto {
+  type: QuoteItemType;
+  sourceId?: number;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface UpdateQuoteItemDto {
+  description?: string;
   quantity?: number;
-  notes?: string;
+  unitPrice?: number;
 }
 
-export interface ProjectWithTotal extends Project {
-  total: number;
+export interface ProjectWithQuoteCount extends Project {
+  quoteCount: number;
 }

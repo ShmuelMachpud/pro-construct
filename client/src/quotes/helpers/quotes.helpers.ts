@@ -1,10 +1,24 @@
-import type { ProjectMaterial } from "../types/quotes.types";
+import type { QuoteItem, QuoteStatus } from "../types/quotes.types";
 
-export const calcLineTotal = (m: ProjectMaterial): number =>
-  Number(m.contractorMaterial.price ?? 0) * Number(m.quantity);
+export const quoteStatusConfig: Record<QuoteStatus, { label: string; color: string }> = {
+  DRAFT: { label: "טיוטה", color: "#9E9E9E" },
+  SENT: { label: "נשלחה", color: "#2196F3" },
+  APPROVED: { label: "אושרה", color: "#4CAF50" },
+  REJECTED: { label: "נדחתה", color: "#F44336" },
+  EXPIRED: { label: "פגה תוקף", color: "#FF9800" },
+};
 
-export const calcGrandTotal = (materials: ProjectMaterial[]): number =>
-  materials.reduce((sum, m) => sum + calcLineTotal(m), 0);
+export const quoteItemTypeLabel: Record<string, string> = {
+  MATERIAL: "חומר",
+  LABOR: "עבודה",
+  OTHER: "אחר",
+};
+
+export const calcLineTotal = (item: QuoteItem): number =>
+  Number(item.quantity) * Number(item.unitPrice);
+
+export const calcGrandTotal = (items: QuoteItem[]): number =>
+  items.reduce((sum, item) => sum + calcLineTotal(item), 0);
 
 export const formatCurrency = (amount: number): string =>
   `₪${amount.toLocaleString("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
