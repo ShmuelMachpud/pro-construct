@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { authenticate } from "../../middleware/auth.middleware";
+import { authenticate, authorize } from "../../middleware/auth.middleware";
 import {
+  getAllProjectsController,
   getProjectsByContractorController,
   getProjectsByClientController,
   getProjectByIdController,
@@ -13,6 +14,7 @@ export const projectsRouter = Router();
 
 projectsRouter.use(authenticate);
 
+projectsRouter.get("/all", authorize("admin", "operator"), getAllProjectsController);
 projectsRouter.get("/", getProjectsByContractorController);
 projectsRouter.get("/client/:clientId", getProjectsByClientController);
 projectsRouter.get("/:id", getProjectByIdController);

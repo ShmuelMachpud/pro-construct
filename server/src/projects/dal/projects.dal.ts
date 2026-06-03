@@ -5,6 +5,10 @@ import { CreateProjectDto, UpdateProjectDto } from "../types/projects.types";
 
 const repository = AppDataSource.getRepository(Project);
 
+export const findAllProjectsDal = async () => {
+  return await repository.find({ order: { createdAt: "DESC" } });
+};
+
 export const findProjectsByContractorDal = async (contractorId: string) => {
   return await repository
     .createQueryBuilder("project")

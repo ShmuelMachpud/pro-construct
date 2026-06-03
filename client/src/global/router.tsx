@@ -14,6 +14,7 @@ import MyMaterialsPage from "../materials/pages/MyMaterialsPage";
 import QuotesPage from "../quotes/pages/QuotesPage";
 import QuotePage from "../quotes/pages/QuotePage";
 import QuoteDetailPage from "../quotes/pages/QuoteDetailPage";
+import DashboardPage from "../dashboard/pages/DashboardPage";
 
 export const router = createBrowserRouter([
   {
@@ -35,23 +36,33 @@ export const router = createBrowserRouter([
       { index: true, element: <RootRedirect /> },
       {
         element: (
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["admin", "operator"]}>
             <Outlet />
           </ProtectedRoute>
         ),
         children: [
+          { path: "dashboard", element: <DashboardPage /> },
           { path: "users", element: <UsersPage /> },
           { path: "materials", element: <MaterialsPage /> },
         ],
       },
-      { path: "my-materials", element: <MyMaterialsPage /> },
-      { path: "quotes", element: <QuotesPage /> },
-      { path: "quotes/:projectId", element: <QuotePage /> },
-      { path: "quotes/:projectId/:quoteId", element: <QuoteDetailPage /> },
-      { path: "projects", element: <ProjectsPage /> },
-      { path: "projects/:id", element: <ProjectPage /> },
-      { path: "clients", element: <ClientsPage /> },
-      { path: "clients/:id", element: <ClientPage /> },
+      {
+        element: (
+          <ProtectedRoute allowedRoles={["contractor"]}>
+            <Outlet />
+          </ProtectedRoute>
+        ),
+        children: [
+          { path: "my-materials", element: <MyMaterialsPage /> },
+          { path: "quotes", element: <QuotesPage /> },
+          { path: "quotes/:projectId", element: <QuotePage /> },
+          { path: "quotes/:projectId/:quoteId", element: <QuoteDetailPage /> },
+          { path: "projects", element: <ProjectsPage /> },
+          { path: "projects/:id", element: <ProjectPage /> },
+          { path: "clients", element: <ClientsPage /> },
+          { path: "clients/:id", element: <ClientPage /> },
+        ],
+      },
     ],
   },
 ]);

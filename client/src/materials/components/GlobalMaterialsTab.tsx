@@ -11,7 +11,7 @@ import { useCategories } from "../hooks/useCategories";
 import type { GlobalMaterial, CreateGlobalMaterialDto } from "../types/materials.types";
 
 const GlobalMaterialsTab = () => {
-  const { materials, loading, error, handleCreate, handleUpdate, handleDelete } = useGlobalMaterials();
+  const { materials, loading, error, handleCreate, handleUpdate, handleDelete, isAdmin: canEdit } = useGlobalMaterials();
   const { categories } = useCategories();
   const [modalOpen, setModalOpen] = useState(false);
   const [editItem, setEditItem] = useState<GlobalMaterial | null>(null);
@@ -45,15 +45,17 @@ const GlobalMaterialsTab = () => {
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => { setEditItem(null); setModalOpen(true); }}
-        >
-          חומר חדש
-        </Button>
-      </Box>
+      {canEdit && (
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => { setEditItem(null); setModalOpen(true); }}
+          >
+            חומר חדש
+          </Button>
+        </Box>
+      )}
 
       {!loading && materials.length === 0 ? (
         <Box sx={{ textAlign: "center", mt: 8, color: "grey.600" }}>
@@ -62,7 +64,7 @@ const GlobalMaterialsTab = () => {
         </Box>
       ) : (
         <GenericTable<GlobalMaterial>
-          columns={getGlobalMaterialColumns(handleEdit, handleDeleteClick)}
+          columns={getGlobalMaterialColumns(handleEdit, handleDeleteClick, canEdit)}
           rows={materials}
           loading={loading}
           emptyMessage="אין חומרים"

@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../../types/auth.types";
 import { handleError } from "../../utils/handleError";
 import {
+  getAllProjectsService,
   getProjectsByContractorService,
   getProjectsByClientService,
   getProjectByIdService,
@@ -9,6 +10,15 @@ import {
   updateProjectService,
   removeProjectService,
 } from "../services/projects.service";
+
+export const getAllProjectsController = async (_req: AuthRequest, res: Response) => {
+  try {
+    const projects = await getAllProjectsService();
+    res.status(200).json(projects);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
 
 export const getProjectsByContractorController = async (req: AuthRequest, res: Response) => {
   try {

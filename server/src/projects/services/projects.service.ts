@@ -1,6 +1,7 @@
 import { CustomError } from "../../utils/customError";
 import { CreateProjectDto, UpdateProjectDto } from "../types/projects.types";
 import {
+  findAllProjectsDal,
   findProjectsByContractorDal,
   findProjectsByClientDal,
   findProjectByIdDal,
@@ -9,6 +10,14 @@ import {
   updateProjectByIdDal,
   deleteProjectDal,
 } from "../dal/projects.dal";
+
+export const getAllProjectsService = async () => {
+  try {
+    return await findAllProjectsDal();
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
 
 export const getProjectsByContractorService = async (contractorId: string) => {
   try {

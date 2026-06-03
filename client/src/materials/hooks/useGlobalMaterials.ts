@@ -5,6 +5,7 @@ import {
   updateGlobalMaterial,
   deleteGlobalMaterial,
 } from "../services/globalMaterials.service";
+import { useAuth } from "../../global/hooks/useAuth";
 import type {
   GlobalMaterial,
   CreateGlobalMaterialDto,
@@ -12,6 +13,7 @@ import type {
 } from "../types/materials.types";
 
 export const useGlobalMaterials = () => {
+  const { isAdmin } = useAuth();
   const [materials, setMaterials] = useState<GlobalMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -44,5 +46,5 @@ export const useGlobalMaterials = () => {
     setMaterials((prev) => prev.filter((m) => m.id !== id));
   };
 
-  return { materials, loading, error, handleCreate, handleUpdate, handleDelete };
+  return { materials, loading, error, handleCreate, handleUpdate, handleDelete, isAdmin };
 };

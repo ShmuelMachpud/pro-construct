@@ -5,6 +5,7 @@ import {
   updateCategory,
   deleteCategory,
 } from "../services/categories.service";
+import { useAuth } from "../../global/hooks/useAuth";
 import type {
   MaterialCategory,
   CreateCategoryDto,
@@ -12,6 +13,7 @@ import type {
 } from "../types/materials.types";
 
 export const useCategories = () => {
+  const { isAdmin } = useAuth();
   const [categories, setCategories] = useState<MaterialCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -44,5 +46,5 @@ export const useCategories = () => {
     setCategories((prev) => prev.filter((c) => c.id !== id));
   };
 
-  return { categories, loading, error, handleCreate, handleUpdate, handleDelete };
+  return { categories, loading, error, handleCreate, handleUpdate, handleDelete, isAdmin };
 };
