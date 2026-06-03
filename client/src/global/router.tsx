@@ -13,6 +13,7 @@ import MaterialsPage from "../materials/pages/MaterialsPage";
 import MyMaterialsPage from "../materials/pages/MyMaterialsPage";
 import QuotesPage from "../quotes/pages/QuotesPage";
 import QuotePage from "../quotes/pages/QuotePage";
+import QuoteDetailPage from "../quotes/pages/QuoteDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -46,6 +47,7 @@ export const router = createBrowserRouter([
       { path: "my-materials", element: <MyMaterialsPage /> },
       { path: "quotes", element: <QuotesPage /> },
       { path: "quotes/:projectId", element: <QuotePage /> },
+      { path: "quotes/:projectId/:quoteId", element: <QuoteDetailPage /> },
       { path: "projects", element: <ProjectsPage /> },
       { path: "projects/:id", element: <ProjectPage /> },
       { path: "clients", element: <ClientsPage /> },

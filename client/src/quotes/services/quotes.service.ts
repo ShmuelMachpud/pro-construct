@@ -1,43 +1,73 @@
 import axiosInstance from "../../global/services/axiosServer";
 import type {
-  ProjectMaterial,
-  AddProjectMaterialDto,
-  UpdateProjectMaterialDto,
+  PriceQuote,
+  QuoteItem,
+  CreatePriceQuoteDto,
+  UpdatePriceQuoteDto,
+  CreateQuoteItemDto,
+  UpdateQuoteItemDto,
 } from "../types/quotes.types";
 
-export const getProjectMaterials = async (
-  projectId: string,
-): Promise<ProjectMaterial[]> => {
-  const { data } = await axiosInstance.get(`/projects/${projectId}/materials`);
+export const getPriceQuotes = async (projectId: string): Promise<PriceQuote[]> => {
+  const { data } = await axiosInstance.get(`/projects/${projectId}/quotes`);
   return data;
 };
 
-export const addProjectMaterial = async (
+export const createPriceQuote = async (
   projectId: string,
-  dto: AddProjectMaterialDto,
-): Promise<ProjectMaterial> => {
+  dto: CreatePriceQuoteDto,
+): Promise<PriceQuote> => {
+  const { data } = await axiosInstance.post(`/projects/${projectId}/quotes`, dto);
+  return data;
+};
+
+export const updatePriceQuote = async (
+  projectId: string,
+  quoteId: number,
+  dto: UpdatePriceQuoteDto,
+): Promise<PriceQuote> => {
+  const { data } = await axiosInstance.patch(`/projects/${projectId}/quotes/${quoteId}`, dto);
+  return data;
+};
+
+export const deletePriceQuote = async (projectId: string, quoteId: number): Promise<void> => {
+  await axiosInstance.delete(`/projects/${projectId}/quotes/${quoteId}`);
+};
+
+export const getQuoteItems = async (projectId: string, quoteId: number): Promise<QuoteItem[]> => {
+  const { data } = await axiosInstance.get(`/projects/${projectId}/quotes/${quoteId}/items`);
+  return data;
+};
+
+export const addQuoteItem = async (
+  projectId: string,
+  quoteId: number,
+  dto: CreateQuoteItemDto,
+): Promise<QuoteItem> => {
   const { data } = await axiosInstance.post(
-    `/projects/${projectId}/materials`,
+    `/projects/${projectId}/quotes/${quoteId}/items`,
     dto,
   );
   return data;
 };
 
-export const updateProjectMaterial = async (
+export const updateQuoteItem = async (
   projectId: string,
-  id: number,
-  dto: UpdateProjectMaterialDto,
-): Promise<ProjectMaterial> => {
-  const { data } = await axiosInstance.put(
-    `/projects/${projectId}/materials/${id}`,
+  quoteId: number,
+  itemId: number,
+  dto: UpdateQuoteItemDto,
+): Promise<QuoteItem> => {
+  const { data } = await axiosInstance.patch(
+    `/projects/${projectId}/quotes/${quoteId}/items/${itemId}`,
     dto,
   );
   return data;
 };
 
-export const deleteProjectMaterial = async (
+export const deleteQuoteItem = async (
   projectId: string,
-  id: number,
+  quoteId: number,
+  itemId: number,
 ): Promise<void> => {
-  await axiosInstance.delete(`/projects/${projectId}/materials/${id}`);
+  await axiosInstance.delete(`/projects/${projectId}/quotes/${quoteId}/items/${itemId}`);
 };

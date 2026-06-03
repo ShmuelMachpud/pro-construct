@@ -8,7 +8,8 @@ import { paypalRouter } from "../paypal/routes/paypal.router";
 import { materialCategoriesRouter } from "../material_categories/routes/material_categories.router";
 import { globalMaterialsRouter } from "../global_materials/routes/global_materials.router";
 import { contractorMaterialsRouter } from "../contractor_materials/routes/contractor_materials.router";
-import { projectMaterialsRouter } from "../project_materials/routes/project_materials.router";
+import { priceQuotesRouter } from "../price_quotes/routes/price_quotes.router";
+import { quoteItemsRouter } from "../quote_items/routes/quote_items.router";
 
 export const router = Router();
 
@@ -18,7 +19,8 @@ router.use("/paypal", paypalRouter);
 router.use("/material-categories", materialCategoriesRouter);
 router.use("/global-materials", globalMaterialsRouter);
 router.use("/contractor-materials", contractorMaterialsRouter);
-router.use("/projects/:projectId/materials", projectMaterialsRouter);
+router.use("/projects/:projectId/quotes", priceQuotesRouter);
+router.use("/projects/:projectId/quotes/:quoteId/items", quoteItemsRouter);
 
 router.use((req: Request, res: Response) =>
   handleError(

@@ -2,7 +2,6 @@ import { Box, Typography, Card, CardContent, Grid, Chip, CircularProgress } from
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import { useNavigate } from "react-router-dom";
 import { useQuotesList } from "../hooks/useQuotesList";
-import { formatCurrency } from "../helpers/quotes.helpers";
 import { statusConfig } from "../../projects/helpers/projects.helpers";
 
 const QuotesPage = () => {
@@ -80,13 +79,9 @@ const QuotesPage = () => {
                       justifyContent: "space-between",
                       alignItems: "center",
                     }}>
-                      <Typography color="grey.600" fontSize="0.75rem">סה"כ הצעה</Typography>
-                      <Typography
-                        fontWeight="bold"
-                        fontSize="1.1rem"
-                        color={project.total > 0 ? "#FF6B00" : "grey.600"}
-                      >
-                        {project.total > 0 ? formatCurrency(project.total) : "—"}
+                      <Typography color="grey.600" fontSize="0.75rem">הצעות מחיר</Typography>
+                      <Typography fontWeight="bold" fontSize="1.1rem" color={project.quoteCount > 0 ? "#FF6B00" : "grey.600"}>
+                        {project.quoteCount > 0 ? project.quoteCount : "—"}
                       </Typography>
                     </Box>
                   </CardContent>
