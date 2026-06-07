@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
-  Box, Typography, Button, Chip, Divider, CircularProgress, MenuItem, Select, FormControl,
+  Box, Typography, Button, Chip, Divider, MenuItem, Select, FormControl,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
