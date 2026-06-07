@@ -33,6 +33,7 @@ const PendingUsersTable = () => {
         onClose={() => setSelectedUser(null)}
         onApprove={approve}
         approving={approving}
+        canApprove={true}
       />
     </>
   );

@@ -8,7 +8,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuotes } from "../hooks/useQuotes";
 import CreateQuoteModal from "../components/CreateQuoteModal";
-import { quoteStatusConfig, formatCurrency } from "../helpers/quotes.helpers";
+import { quoteStatusConfig } from "../helpers/quotes.helpers";
 import { getProjectById } from "../../projects/services/project.service";
 import { statusConfig } from "../../projects/helpers/projects.helpers";
 import type { Project } from "../../projects/types/projects.types";
