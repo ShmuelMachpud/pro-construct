@@ -9,6 +9,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useProject } from "../hooks/useProject";
 import { statusConfig, typeLabels } from "../helpers/projects.helpers";
 import { projectTypeOptions, projectStatusOptions } from "../helpers/createProject.helpers";
+import ProjectQuotesSection from "../components/ProjectQuotesSection";
 
 const ProjectPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -135,6 +136,8 @@ const ProjectPage = () => {
           )}
         </Box>
       )}
+
+      <ProjectQuotesSection projectId={id!} />
     </Box>
   );
 };

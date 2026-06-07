@@ -18,3 +18,15 @@ export interface UpdatePriceQuoteDto {
   validUntil?: string | null;
   notes?: string | null;
 }
+
+export interface PriceQuoteWithProject {
+  id: number;
+  projectId: string;
+  projectName: string;
+  title: string;
+  status: QuoteStatus;
+  validUntil: Date | null;
+  notes: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}

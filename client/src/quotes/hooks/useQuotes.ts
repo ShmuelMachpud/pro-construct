@@ -22,9 +22,10 @@ export const useQuotes = (projectId: string) => {
 
   useEffect(() => { load(); }, [projectId]);
 
-  const handleCreate = async (dto: CreatePriceQuoteDto): Promise<void> => {
+  const handleCreate = async (dto: CreatePriceQuoteDto): Promise<PriceQuote> => {
     const created = await createPriceQuote(projectId, dto);
     setQuotes((prev) => [created, ...prev]);
+    return created;
   };
 
   const handleUpdate = async (quoteId: number, dto: UpdatePriceQuoteDto): Promise<void> => {

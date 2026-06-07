@@ -2,12 +2,23 @@ import { Response } from "express";
 import { handleError } from "../../utils/handleError";
 import { AuthRequest } from "../../types/auth.types";
 import {
+  getAllQuotesByContractorService,
   getAllPriceQuotesService,
   getPriceQuoteByIdService,
   createPriceQuoteService,
   updatePriceQuoteService,
   removePriceQuoteService,
 } from "../services/price_quotes.service";
+
+export const getAllQuotesByContractorController = async (req: AuthRequest, res: Response) => {
+  try {
+    const contractorId = req.user!.id;
+    const quotes = await getAllQuotesByContractorService(contractorId);
+    res.status(200).json(quotes);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
 
 export const getAllPriceQuotesController = async (req: AuthRequest, res: Response) => {
   try {

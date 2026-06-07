@@ -1,12 +1,18 @@
 import axiosInstance from "../../global/services/axiosServer";
 import type {
   PriceQuote,
+  PriceQuoteWithProject,
   QuoteItem,
   CreatePriceQuoteDto,
   UpdatePriceQuoteDto,
   CreateQuoteItemDto,
   UpdateQuoteItemDto,
 } from "../types/quotes.types";
+
+export const getAllQuotes = async (): Promise<PriceQuoteWithProject[]> => {
+  const { data } = await axiosInstance.get("/quotes");
+  return data;
+};
 
 export const getPriceQuotes = async (projectId: string): Promise<PriceQuote[]> => {
   const { data } = await axiosInstance.get(`/projects/${projectId}/quotes`);

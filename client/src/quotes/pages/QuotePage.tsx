@@ -146,7 +146,8 @@ const QuotePage = () => {
       <CreateQuoteModal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
-        onSave={handleCreate}
+        onSave={(_projectId, dto) => handleCreate(dto)}
+        fixedProjectId={projectId}
       />
     </Box>
   );
