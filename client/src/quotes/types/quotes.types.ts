@@ -56,3 +56,7 @@ export interface UpdateQuoteItemDto {
 export interface ProjectWithQuoteCount extends Project {
   quoteCount: number;
 }
+
+export interface PriceQuoteWithProject extends PriceQuote {
+  projectName: string;
+}

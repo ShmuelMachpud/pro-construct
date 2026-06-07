@@ -1,6 +1,7 @@
 import { CustomError } from "../../utils/customError";
 import { getProjectByIdAndContractorService } from "../../projects/services/projects.service";
 import {
+  findAllQuotesByContractorDal,
   findAllPriceQuotesDal,
   findPriceQuoteByIdDal,
   insertPriceQuoteDal,
@@ -8,6 +9,14 @@ import {
   deletePriceQuoteDal,
 } from "../dal/price_quotes.dal";
 import { CreatePriceQuoteDto, UpdatePriceQuoteDto } from "../types/price_quotes.types";
+
+export const getAllQuotesByContractorService = async (contractorId: string) => {
+  try {
+    return await findAllQuotesByContractorDal(contractorId);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
 
 export const getAllPriceQuotesService = async (projectId: string, contractorId: string) => {
   try {
