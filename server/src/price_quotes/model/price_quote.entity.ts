@@ -27,6 +27,9 @@ export class PriceQuote {
   @Column({ type: "text", nullable: true })
   notes: string | null;
 
+  @Column({ type: "varchar", nullable: true })
+  pdfUrl: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 

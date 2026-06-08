@@ -10,7 +10,10 @@ import {
   removePriceQuoteService,
 } from "../services/price_quotes.service";
 
-export const getAllQuotesByContractorController = async (req: AuthRequest, res: Response) => {
+export const getAllQuotesByContractorController = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
     const contractorId = req.user!.id;
     const quotes = await getAllQuotesByContractorService(contractorId);
@@ -20,7 +23,10 @@ export const getAllQuotesByContractorController = async (req: AuthRequest, res: 
   }
 };
 
-export const getAllPriceQuotesController = async (req: AuthRequest, res: Response) => {
+export const getAllPriceQuotesController = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
     const contractorId = req.user!.id;
     const projectId = req.params.projectId as string;
@@ -31,42 +37,67 @@ export const getAllPriceQuotesController = async (req: AuthRequest, res: Respons
   }
 };
 
-export const getPriceQuoteByIdController = async (req: AuthRequest, res: Response) => {
+export const getPriceQuoteByIdController = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
     const contractorId = req.user!.id;
     const projectId = req.params.projectId as string;
     const quoteId = req.params.quoteId as string;
-    const quote = await getPriceQuoteByIdService(Number(quoteId), projectId, contractorId);
+    const quote = await getPriceQuoteByIdService(
+      Number(quoteId),
+      projectId,
+      contractorId,
+    );
     res.status(200).json(quote);
   } catch (error) {
     handleError(error, res);
   }
 };
 
-export const createPriceQuoteController = async (req: AuthRequest, res: Response) => {
+export const createPriceQuoteController = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
     const contractorId = req.user!.id;
     const projectId = req.params.projectId as string;
-    const quote = await createPriceQuoteService(projectId, contractorId, req.body);
+    const quote = await createPriceQuoteService(
+      projectId,
+      contractorId,
+      req.body,
+    );
     res.status(201).json(quote);
   } catch (error) {
     handleError(error, res);
   }
 };
 
-export const updatePriceQuoteController = async (req: AuthRequest, res: Response) => {
+export const updatePriceQuoteController = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
     const contractorId = req.user!.id;
     const projectId = req.params.projectId as string;
     const quoteId = req.params.quoteId as string;
-    const quote = await updatePriceQuoteService(Number(quoteId), projectId, contractorId, req.body);
+    const quote = await updatePriceQuoteService(
+      Number(quoteId),
+      projectId,
+      contractorId,
+      req.body,
+    );
     res.status(200).json(quote);
   } catch (error) {
     handleError(error, res);
   }
 };
 
-export const removePriceQuoteController = async (req: AuthRequest, res: Response) => {
+export const removePriceQuoteController = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
     const contractorId = req.user!.id;
     const projectId = req.params.projectId as string;

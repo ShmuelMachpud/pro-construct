@@ -9,6 +9,8 @@ export const ENV = {
     .split(",")
     .map((o) => o.trim())
     .filter(Boolean),
+  SUPABASE_URL: process.env.SUPABASE_URL || "",
+  SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY || "",
 };
 
 export const ENV_PAYPAL = {

@@ -1,5 +1,6 @@
 import { CustomError } from "../../utils/customError";
 import { getProjectByIdAndContractorService } from "../../projects/services/projects.service";
+import { regenerateQuotePdf } from "../helpers/quotePdfPipeline";
 import {
   findAllQuotesByContractorDal,
   findAllPriceQuotesDal,
@@ -8,7 +9,10 @@ import {
   updatePriceQuoteByIdDal,
   deletePriceQuoteDal,
 } from "../dal/price_quotes.dal";
-import { CreatePriceQuoteDto, UpdatePriceQuoteDto } from "../types/price_quotes.types";
+import {
+  CreatePriceQuoteDto,
+  UpdatePriceQuoteDto,
+} from "../types/price_quotes.types";
 
 export const getAllQuotesByContractorService = async (contractorId: string) => {
   try {
@@ -18,7 +22,10 @@ export const getAllQuotesByContractorService = async (contractorId: string) => {
   }
 };
 
-export const getAllPriceQuotesService = async (projectId: string, contractorId: string) => {
+export const getAllPriceQuotesService = async (
+  projectId: string,
+  contractorId: string,
+) => {
   try {
     await getProjectByIdAndContractorService(projectId, contractorId);
     return await findAllPriceQuotesDal(projectId);
@@ -49,7 +56,9 @@ export const createPriceQuoteService = async (
 ) => {
   try {
     await getProjectByIdAndContractorService(projectId, contractorId);
-    return await insertPriceQuoteDal(projectId, dto);
+    const quote = await insertPriceQuoteDal(projectId, dto);
+    regenerateQuotePdf(quote.id, projectId);
+    return quote;
   } catch (error) {
     return Promise.reject(error);
   }
@@ -65,6 +74,7 @@ export const updatePriceQuoteService = async (
     await getProjectByIdAndContractorService(projectId, contractorId);
     const quote = await updatePriceQuoteByIdDal(id, projectId, dto);
     if (!quote) throw new CustomError("Price quote not found", 404);
+    regenerateQuotePdf(id, projectId);
     return quote;
   } catch (error) {
     return Promise.reject(error);
