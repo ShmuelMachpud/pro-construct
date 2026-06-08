@@ -1,4 +1,5 @@
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 import type { PriceQuote } from "../price_quotes/model/price_quote.entity";
 import type { QuoteItem } from "../quote_items/model/quote_item.entity";
 
@@ -153,7 +154,11 @@ export const generateQuotePdf = async (
   items: QuoteItem[],
   projectName: string,
 ): Promise<Buffer> => {
-  const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    executablePath: await chromium.executablePath(),
+    headless: true,
+  });
   try {
     const page = await browser.newPage();
     await page.setContent(buildHtml(quote, items, projectName), { waitUntil: "load" });
