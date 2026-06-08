@@ -3,12 +3,11 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, TextField, Grid, Box, MenuItem, Select,
   FormControl, InputLabel, CircularProgress, Typography,
-  Stepper, Step, StepLabel, Divider, IconButton, Chip,
+  Stepper, Step, StepLabel, Divider, Chip,
   ToggleButton, ToggleButtonGroup,
 } from "@mui/material";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { getProjects } from "../../projects/services/project.service";
 import { addQuoteItem } from "../services/quotes.service";
 import { useContractorMaterials } from "../../materials/hooks/useContractorMaterials";
