@@ -19,6 +19,10 @@ export interface UpdatePriceQuoteDto {
   notes?: string | null;
 }
 
+export interface UpdatePriceQuoteInternalDto extends UpdatePriceQuoteDto {
+  pdfUrl?: string | null;
+}
+
 export interface PriceQuoteWithProject {
   id: number;
   projectId: string;

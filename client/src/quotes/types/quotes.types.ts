@@ -10,6 +10,7 @@ export interface PriceQuote {
   status: QuoteStatus;
   validUntil: string | null;
   notes: string | null;
+  pdfUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }

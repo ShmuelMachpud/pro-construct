@@ -2,7 +2,7 @@ import { AppDataSource } from "../../config/database";
 import { Client } from "../../clients/model/client.entity";
 import { Project } from "../../projects/model/project.entity";
 import { PriceQuote } from "../model/price_quote.entity";
-import { CreatePriceQuoteDto, PriceQuoteWithProject, UpdatePriceQuoteDto } from "../types/price_quotes.types";
+import { CreatePriceQuoteDto, PriceQuoteWithProject, UpdatePriceQuoteDto, UpdatePriceQuoteInternalDto } from "../types/price_quotes.types";
 
 const repository = AppDataSource.getRepository(PriceQuote);
 
@@ -46,7 +46,7 @@ export const insertPriceQuoteDal = async (projectId: string, dto: CreatePriceQuo
 export const updatePriceQuoteByIdDal = async (
   id: number,
   projectId: string,
-  dto: UpdatePriceQuoteDto,
+  dto: UpdatePriceQuoteDto | UpdatePriceQuoteInternalDto,
 ) => {
   await repository.update({ id, projectId }, dto);
   return await repository.findOne({ where: { id, projectId } });

@@ -1,5 +1,6 @@
 import { CustomError } from "../../utils/customError";
 import { getPriceQuoteByIdService } from "../../price_quotes/services/price_quotes.service";
+import { regenerateQuotePdf } from "../../price_quotes/helpers/quotePdfPipeline";
 import {
   findAllQuoteItemsDal,
   findQuoteItemByIdDal,
@@ -49,7 +50,9 @@ export const addQuoteItemService = async (
     await getPriceQuoteByIdService(quoteId, projectId, contractorId);
     if (requiresSourceId(dto.type) && !dto.sourceId)
       throw new CustomError(`sourceId is required for type ${dto.type}`, 400);
-    return await insertQuoteItemDal(quoteId, dto);
+    const item = await insertQuoteItemDal(quoteId, dto);
+    regenerateQuotePdf(quoteId, projectId);
+    return item;
   } catch (error) {
     return Promise.reject(error);
   }
@@ -66,6 +69,7 @@ export const updateQuoteItemService = async (
     await getPriceQuoteByIdService(quoteId, projectId, contractorId);
     const item = await updateQuoteItemByIdDal(id, quoteId, dto);
     if (!item) throw new CustomError("Quote item not found", 404);
+    regenerateQuotePdf(quoteId, projectId);
     return item;
   } catch (error) {
     return Promise.reject(error);
@@ -82,6 +86,7 @@ export const removeQuoteItemService = async (
     await getPriceQuoteByIdService(quoteId, projectId, contractorId);
     const deleted = await deleteQuoteItemDal(id, quoteId);
     if (!deleted) throw new CustomError("Quote item not found", 404);
+    regenerateQuotePdf(quoteId, projectId);
   } catch (error) {
     return Promise.reject(error);
   }

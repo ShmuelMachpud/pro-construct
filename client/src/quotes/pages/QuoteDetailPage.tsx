@@ -4,6 +4,7 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
+import DownloadIcon from "@mui/icons-material/Download";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuoteItems } from "../hooks/useQuoteItems";
 import { useQuotes } from "../hooks/useQuotes";
@@ -77,9 +78,29 @@ const QuoteDetailPage = () => {
             />
           )}
         </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAddOpen(true)}>
-          הוסף פריט
-        </Button>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          {quote?.pdfUrl && (
+            <Button
+              variant="outlined"
+              startIcon={<DownloadIcon />}
+              onClick={async () => {
+                const res = await fetch(quote.pdfUrl!);
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `quote_${quote.id}.pdf`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              הורד PDF
+            </Button>
+          )}
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAddOpen(true)}>
+            הוסף פריט
+          </Button>
+        </Box>
       </Box>
 
       <QuoteItemsTable
