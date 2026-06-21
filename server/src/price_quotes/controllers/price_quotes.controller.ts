@@ -10,6 +10,19 @@ import {
   removePriceQuoteService,
 } from "../services/price_quotes.service";
 
+export const getQuotesByContractorAdminController = async (
+  req: AuthRequest,
+  res: Response,
+) => {
+  try {
+    const { contractorId } = req.params;
+    const quotes = await getAllQuotesByContractorService(contractorId as string);
+    res.status(200).json(quotes);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
+
 export const getAllQuotesByContractorController = async (
   req: AuthRequest,
   res: Response,

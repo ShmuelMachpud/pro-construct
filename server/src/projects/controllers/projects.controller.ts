@@ -11,6 +11,16 @@ import {
   removeProjectService,
 } from "../services/projects.service";
 
+export const getProjectsByContractorAdminController = async (req: AuthRequest, res: Response) => {
+  try {
+    const { contractorId } = req.params;
+    const projects = await getProjectsByContractorService(contractorId as string);
+    res.status(200).json(projects);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
+
 export const getAllProjectsController = async (_req: AuthRequest, res: Response) => {
   try {
     const projects = await getAllProjectsService();

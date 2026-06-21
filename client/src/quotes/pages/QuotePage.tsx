@@ -7,7 +7,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuotes } from "../hooks/useQuotes";
-import CreateQuoteModal from "../components/CreateQuoteModal";
+import { CreateQuoteModal } from "../components/CreateQuoteModal";
 import { quoteStatusConfig } from "../helpers/quotes.helpers";
 import { getProjectById } from "../../projects/services/project.service";
 import { statusConfig } from "../../projects/helpers/projects.helpers";

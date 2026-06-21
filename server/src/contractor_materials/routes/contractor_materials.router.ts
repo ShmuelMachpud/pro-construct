@@ -1,6 +1,8 @@
 import { Router } from "express";
-import { authenticate } from "../../middleware/auth.middleware";
+import { authenticate, authorize } from "../../middleware/auth.middleware";
+import { UserRole } from "../../types/auth.types";
 import {
+  getContractorMaterialsByContractorController,
   getAllContractorMaterialsController,
   getContractorMaterialByIdController,
   addContractorMaterialController,
@@ -12,6 +14,7 @@ export const contractorMaterialsRouter = Router();
 
 contractorMaterialsRouter.use(authenticate);
 
+contractorMaterialsRouter.get("/contractor/:contractorId", authorize(UserRole.ADMIN, UserRole.OPERATOR), getContractorMaterialsByContractorController);
 contractorMaterialsRouter.get("/", getAllContractorMaterialsController);
 contractorMaterialsRouter.get("/:id", getContractorMaterialByIdController);
 contractorMaterialsRouter.post("/", addContractorMaterialController);

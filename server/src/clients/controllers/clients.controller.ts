@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { handleError } from "../../utils/handleError";
 import {
+  getClientsByContractorService,
   getAllClientsService,
   getClientByIdService,
   createClientService,
@@ -8,6 +9,16 @@ import {
   removeClientService,
 } from "../services/clients.service";
 import { AuthRequest } from "../../types/auth.types";
+
+export const getClientsByContractorController = async (req: AuthRequest, res: Response) => {
+  try {
+    const { contractorId } = req.params;
+    const items = await getClientsByContractorService(contractorId as string);
+    res.status(200).json(items);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
 
 export const getAllClientsController = async (req: AuthRequest, res: Response) => {
   try {

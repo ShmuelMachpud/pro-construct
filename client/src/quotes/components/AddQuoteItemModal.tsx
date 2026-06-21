@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, TextField, MenuItem, Box, Grid, Typography, ToggleButton, ToggleButtonGroup,
 } from "@mui/material";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import { useQuoteItemForm } from "../hooks/useQuoteItemForm";
 import type { ContractorMaterial } from "../../materials/types/materials.types";
 import type { CreateQuoteItemDto, QuoteItemType } from "../types/quotes.types";
 import { formatCurrency, quoteItemTypeLabel } from "../helpers/quotes.helpers";
@@ -15,74 +16,31 @@ interface Props {
   contractorMaterials: ContractorMaterial[];
 }
 
-const emptyForm = {
-  type: "MATERIAL" as QuoteItemType,
-  contractorMaterialId: 0,
-  description: "",
-  quantity: "",
-  unitPrice: "",
-};
-
-const AddQuoteItemModal = ({ open, onClose, onSave, contractorMaterials }: Props) => {
-  const [form, setForm] = useState(emptyForm);
+export const AddQuoteItemModal = ({ open, onClose, onSave, contractorMaterials }: Props) => {
+  const { values, setValue, errors, onBlur, isValid, validate, reset, handleTypeChange, handleMaterialSelect, selectedMaterial, lineTotal, buildDto } =
+    useQuoteItemForm(contractorMaterials);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
 
-  useEffect(() => {
-    if (!open) { setForm(emptyForm); setError(""); }
-  }, [open]);
-
-  const handleTypeChange = (_: React.MouseEvent<HTMLElement>, value: QuoteItemType | null) => {
-    if (value) setForm({ ...emptyForm, type: value });
-  };
-
-  const handleChange = (field: keyof typeof emptyForm, value: string | number) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
-
-  const selectedMaterial = contractorMaterials.find((m) => m.id === form.contractorMaterialId);
-
-  const handleMaterialSelect = (materialId: number) => {
-    const mat = contractorMaterials.find((m) => m.id === materialId);
-    setForm((prev) => ({
-      ...prev,
-      contractorMaterialId: materialId,
-      description: mat ? mat.globalMaterial.name : "",
-      unitPrice: mat?.price != null ? String(mat.price) : "",
-    }));
-  };
+  const handleClose = () => { reset(); setServerError(""); onClose(); };
 
   const handleSubmit = async () => {
-    if (form.type === "MATERIAL" && !form.contractorMaterialId) {
-      setError("יש לבחור חומר"); return;
-    }
-    if (!form.description.trim()) { setError("יש להזין תיאור"); return; }
-    if (!form.quantity || Number(form.quantity) <= 0) { setError("יש להזין כמות תקינה"); return; }
-    if (!form.unitPrice || Number(form.unitPrice) < 0) { setError("יש להזין מחיר ליחידה"); return; }
+    if (!validate()) return;
     setLoading(true);
-    setError("");
+    setServerError("");
     try {
-      await onSave({
-        type: form.type,
-        sourceId: form.type === "MATERIAL" ? form.contractorMaterialId : undefined,
-        description: form.description.trim(),
-        quantity: Number(form.quantity),
-        unitPrice: Number(form.unitPrice),
-      });
-      onClose();
-    } catch (err: any) {
-      setError(err?.response?.data?.message ?? "שגיאה בהוספה, נסה שוב");
+      await onSave(buildDto());
+      handleClose();
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setServerError(msg ?? "שגיאה בהוספה, נסה שוב");
     } finally {
       setLoading(false);
     }
   };
 
-  const lineTotal =
-    form.quantity && form.unitPrice
-      ? Number(form.quantity) * Number(form.unitPrice)
-      : null;
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth
       PaperProps={{ sx: { backgroundColor: "#1E1E1E", border: "1px solid rgba(255,107,0,0.2)", borderRadius: 3 } }}
     >
       <DialogTitle sx={{ color: "white", display: "flex", alignItems: "center", gap: 1 }}>
@@ -94,28 +52,33 @@ const AddQuoteItemModal = ({ open, onClose, onSave, contractorMaterials }: Props
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
           <Grid size={{ xs: 12 }}>
             <ToggleButtonGroup
-              value={form.type}
+              value={values.type}
               exclusive
-              onChange={handleTypeChange}
+              onChange={(_, val: QuoteItemType | null) => { if (val) handleTypeChange(val); }}
               fullWidth
               size="small"
             >
               {(["MATERIAL", "LABOR", "OTHER"] as QuoteItemType[]).map((t) => (
-                <ToggleButton key={t} value={t} sx={{ color: "grey.400", "&.Mui-selected": { color: "primary.main", borderColor: "primary.main" } }}>
+                <ToggleButton key={t} value={t}
+                  sx={{ color: "grey.400", "&.Mui-selected": { color: "primary.main", borderColor: "primary.main" } }}
+                >
                   {quoteItemTypeLabel[t]}
                 </ToggleButton>
               ))}
             </ToggleButtonGroup>
           </Grid>
 
-          {form.type === "MATERIAL" && (
+          {values.type === "MATERIAL" && (
             <Grid size={{ xs: 12 }}>
               <TextField
                 select
                 label="חומר *"
                 fullWidth
-                value={form.contractorMaterialId || ""}
-                onChange={(e) => handleMaterialSelect(Number(e.target.value))}
+                value={values.contractorMaterialId}
+                onChange={(e) => handleMaterialSelect(e.target.value)}
+                onBlur={() => onBlur("contractorMaterialId")}
+                error={!!errors.contractorMaterialId}
+                helperText={errors.contractorMaterialId}
               >
                 {contractorMaterials.length === 0 ? (
                   <MenuItem disabled>
@@ -123,7 +86,7 @@ const AddQuoteItemModal = ({ open, onClose, onSave, contractorMaterials }: Props
                   </MenuItem>
                 ) : (
                   contractorMaterials.map((m) => (
-                    <MenuItem key={m.id} value={m.id}>
+                    <MenuItem key={m.id} value={String(m.id)}>
                       <Box>
                         <Typography fontSize="0.9rem">{m.globalMaterial.name}</Typography>
                         <Typography fontSize="0.75rem" color="grey.500">
@@ -155,8 +118,11 @@ const AddQuoteItemModal = ({ open, onClose, onSave, contractorMaterials }: Props
             <TextField
               label="תיאור *"
               fullWidth
-              value={form.description}
-              onChange={(e) => handleChange("description", e.target.value)}
+              value={values.description}
+              onChange={(e) => setValue("description", e.target.value)}
+              onBlur={() => onBlur("description")}
+              error={!!errors.description}
+              helperText={errors.description}
             />
           </Grid>
 
@@ -166,8 +132,11 @@ const AddQuoteItemModal = ({ open, onClose, onSave, contractorMaterials }: Props
               fullWidth
               type="number"
               inputProps={{ min: 0.001, step: 0.001 }}
-              value={form.quantity}
-              onChange={(e) => handleChange("quantity", e.target.value)}
+              value={values.quantity}
+              onChange={(e) => setValue("quantity", e.target.value)}
+              onBlur={() => onBlur("quantity")}
+              error={!!errors.quantity}
+              helperText={errors.quantity}
             />
           </Grid>
 
@@ -177,31 +146,30 @@ const AddQuoteItemModal = ({ open, onClose, onSave, contractorMaterials }: Props
               fullWidth
               type="number"
               inputProps={{ min: 0, step: 0.01 }}
-              value={form.unitPrice}
-              onChange={(e) => handleChange("unitPrice", e.target.value)}
+              value={values.unitPrice}
+              onChange={(e) => setValue("unitPrice", e.target.value)}
+              onBlur={() => onBlur("unitPrice")}
+              error={!!errors.unitPrice}
+              helperText={errors.unitPrice}
             />
           </Grid>
 
           {lineTotal !== null && lineTotal > 0 && (
             <Grid size={{ xs: 12 }}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Typography color="grey.400" fontSize="0.875rem">
-                  סה"כ שורה:{" "}
-                  <strong style={{ color: "#FF6B00", fontSize: "1rem" }}>
-                    {formatCurrency(lineTotal)}
-                  </strong>
-                </Typography>
-              </Box>
+              <Typography color="grey.400" fontSize="0.875rem">
+                סה"כ שורה:{" "}
+                <strong style={{ color: "#FF6B00", fontSize: "1rem" }}>{formatCurrency(lineTotal)}</strong>
+              </Typography>
             </Grid>
           )}
         </Grid>
 
-        {error && <Box sx={{ mt: 1.5, color: "error.main", fontSize: "0.875rem" }}>{error}</Box>}
+        {serverError && <Box sx={{ mt: 1.5, color: "error.main", fontSize: "0.875rem" }}>{serverError}</Box>}
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 3 }}>
-        <Button onClick={onClose} color="inherit">ביטול</Button>
-        <Button variant="contained" onClick={handleSubmit} disabled={loading}>
+        <Button onClick={handleClose} color="inherit">ביטול</Button>
+        <Button variant="contained" onClick={handleSubmit} disabled={loading || !isValid}>
           {loading ? "מוסיף..." : "הוסף"}
         </Button>
       </DialogActions>
@@ -209,4 +177,3 @@ const AddQuoteItemModal = ({ open, onClose, onSave, contractorMaterials }: Props
   );
 };
 
-export default AddQuoteItemModal;

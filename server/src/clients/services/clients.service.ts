@@ -1,6 +1,7 @@
 import { CustomError } from "../../utils/customError";
 import {
   findAllClientsDal,
+  findClientsByContractorDal,
   findClientByIdDal,
   insertClientDal,
   updateClientByIdDal,
@@ -8,6 +9,14 @@ import {
 } from "../dal/clients.dal";
 import { normalizeCreateClient } from "../helpers/clients.helpers";
 import { CreateClientDto, UpdateClientDto } from "../types/clients.types";
+
+export const getClientsByContractorService = async (contractorId: string) => {
+  try {
+    return await findClientsByContractorDal(contractorId);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
 
 export const getAllClientsService = async (userId: string) => {
   try {

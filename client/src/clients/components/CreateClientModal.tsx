@@ -1,11 +1,9 @@
-import { useState } from "react";
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, TextField, MenuItem, Grid, Box,
 } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import type { CreateClientDto } from "../types/clients.types";
-import { createClient } from "../services/client.service";
+import { useCreateClient } from "../hooks/useCreateClient";
 
 interface Props {
   open: boolean;
@@ -13,51 +11,9 @@ interface Props {
   onCreated: () => void;
 }
 
-const emptyForm: CreateClientDto = {
-  type: "private",
-  name: "",
-  phone: "",
-  email: "",
-  address: "",
-  billingName: "",
-  billingPhone: "",
-  billingAddress: "",
-};
-
-const CreateClientModal = ({ open, onClose, onCreated }: Props) => {
-  const [form, setForm] = useState<CreateClientDto>(emptyForm);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleChange = (field: keyof CreateClientDto, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = async () => {
-    if (!form.name || !form.phone) {
-      setError("שם וטלפון הם שדות חובה");
-      return;
-    }
-    setLoading(true);
-    setError("");
-    try {
-      await createClient(form);
-      setForm(emptyForm);
-      onCreated();
-      onClose();
-    } catch (err: any) {
-      const msg = err?.response?.data?.message;
-      setError(msg ? `שגיאה: ${msg}` : "שגיאה ביצירת הלקוח, נסה שוב");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleClose = () => {
-    setForm(emptyForm);
-    setError("");
-    onClose();
-  };
+export const CreateClientModal = ({ open, onClose, onCreated }: Props) => {
+  const { values, setValue, errors, onBlur, isValid, loading, serverError, handleSubmit, handleClose } =
+    useCreateClient(onCreated, onClose);
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth
@@ -74,8 +30,11 @@ const CreateClientModal = ({ open, onClose, onCreated }: Props) => {
             <TextField
               label="שם לקוח *"
               fullWidth
-              value={form.name}
-              onChange={(e) => handleChange("name", e.target.value)}
+              value={values.name}
+              onChange={(e) => setValue("name", e.target.value)}
+              onBlur={() => onBlur("name")}
+              error={!!errors.name}
+              helperText={errors.name}
             />
           </Grid>
 
@@ -84,8 +43,8 @@ const CreateClientModal = ({ open, onClose, onCreated }: Props) => {
               select
               label="סוג לקוח"
               fullWidth
-              value={form.type}
-              onChange={(e) => handleChange("type", e.target.value)}
+              value={values.type}
+              onChange={(e) => setValue("type", e.target.value)}
             >
               <MenuItem value="private">פרטי</MenuItem>
               <MenuItem value="business">עסקי</MenuItem>
@@ -96,8 +55,11 @@ const CreateClientModal = ({ open, onClose, onCreated }: Props) => {
             <TextField
               label="טלפון *"
               fullWidth
-              value={form.phone}
-              onChange={(e) => handleChange("phone", e.target.value)}
+              value={values.phone}
+              onChange={(e) => setValue("phone", e.target.value)}
+              onBlur={() => onBlur("phone")}
+              error={!!errors.phone}
+              helperText={errors.phone}
             />
           </Grid>
 
@@ -105,8 +67,11 @@ const CreateClientModal = ({ open, onClose, onCreated }: Props) => {
             <TextField
               label="אימייל"
               fullWidth
-              value={form.email}
-              onChange={(e) => handleChange("email", e.target.value)}
+              value={values.email}
+              onChange={(e) => setValue("email", e.target.value)}
+              onBlur={() => onBlur("email")}
+              error={!!errors.email}
+              helperText={errors.email}
             />
           </Grid>
 
@@ -114,8 +79,8 @@ const CreateClientModal = ({ open, onClose, onCreated }: Props) => {
             <TextField
               label="כתובת"
               fullWidth
-              value={form.address}
-              onChange={(e) => handleChange("address", e.target.value)}
+              value={values.address}
+              onChange={(e) => setValue("address", e.target.value)}
             />
           </Grid>
 
@@ -123,8 +88,8 @@ const CreateClientModal = ({ open, onClose, onCreated }: Props) => {
             <TextField
               label="שם לחשבונית"
               fullWidth
-              value={form.billingName}
-              onChange={(e) => handleChange("billingName", e.target.value)}
+              value={values.billingName}
+              onChange={(e) => setValue("billingName", e.target.value)}
             />
           </Grid>
 
@@ -132,30 +97,32 @@ const CreateClientModal = ({ open, onClose, onCreated }: Props) => {
             <TextField
               label="טלפון לחשבונית"
               fullWidth
-              multiline
-              value={form.billingPhone}
-              onChange={(e) => handleChange("billingPhone", e.target.value)}
+              value={values.billingPhone}
+              onChange={(e) => setValue("billingPhone", e.target.value)}
+              onBlur={() => onBlur("billingPhone")}
+              error={!!errors.billingPhone}
+              helperText={errors.billingPhone}
             />
           </Grid>
+
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
               label="כתובת לחשבונית"
               fullWidth
-              multiline
-              value={form.billingAddress}
-              onChange={(e) => handleChange("billingAddress", e.target.value)}
+              value={values.billingAddress}
+              onChange={(e) => setValue("billingAddress", e.target.value)}
             />
           </Grid>
         </Grid>
 
-        {error && (
-          <Box sx={{ mt: 2, color: "error.main", fontSize: "0.875rem" }}>{error}</Box>
+        {serverError && (
+          <Box sx={{ mt: 2, color: "error.main", fontSize: "0.875rem" }}>{serverError}</Box>
         )}
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 3 }}>
         <Button onClick={handleClose} color="inherit">ביטול</Button>
-        <Button variant="contained" onClick={handleSubmit} disabled={loading}>
+        <Button variant="contained" onClick={handleSubmit} disabled={loading || !isValid}>
           {loading ? "שומר..." : "שמור לקוח"}
         </Button>
       </DialogActions>
@@ -163,4 +130,3 @@ const CreateClientModal = ({ open, onClose, onCreated }: Props) => {
   );
 };
 
-export default CreateClientModal;

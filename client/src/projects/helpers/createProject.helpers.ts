@@ -27,13 +27,34 @@ export const createProjectInitialData: CreateProjectFormType = {
 };
 
 export const createProjectSchema = Joi.object<CreateProjectFormType>({
-  name: Joi.string().required().messages({ "string.empty": "שם פרויקט הוא שדה חובה", "any.required": "שם פרויקט הוא שדה חובה" }),
-  type: Joi.string().valid("construction", "renovation").required().messages({ "any.only": "סוג פרויקט לא תקין", "string.empty": "סוג פרויקט הוא שדה חובה", "any.required": "סוג פרויקט הוא שדה חובה" }),
-  location: Joi.string().required().messages({ "string.empty": "מיקום הוא שדה חובה", "any.required": "מיקום הוא שדה חובה" }),
-  clientId: Joi.string().required().messages({ "string.empty": "יש לבחור לקוח", "any.required": "יש לבחור לקוח" }),
+  name: Joi.string().required().messages({
+    "string.empty": "שם פרויקט הוא שדה חובה",
+    "any.required": "שם פרויקט הוא שדה חובה",
+  }),
+  type: Joi.string().valid("construction", "renovation").required().messages({
+    "any.only": "סוג פרויקט לא תקין",
+    "string.empty": "סוג פרויקט הוא שדה חובה",
+    "any.required": "סוג פרויקט הוא שדה חובה",
+  }),
+  location: Joi.string().required().messages({
+    "string.empty": "מיקום הוא שדה חובה",
+    "any.required": "מיקום הוא שדה חובה",
+  }),
+  clientId: Joi.string().required().messages({
+    "string.empty": "יש לבחור לקוח",
+    "any.required": "יש לבחור לקוח",
+  }),
   status: Joi.string().valid("planning", "in_progress", "completed").allow("").optional(),
   startDate: Joi.string().allow("").optional(),
-  endDate: Joi.string().allow("").optional(),
+  endDate: Joi.string().allow("").optional().custom((value, helpers) => {
+    const parent = helpers.state.ancestors[0] as CreateProjectFormType | undefined;
+    const startDate = parent?.startDate;
+    if (value && startDate && value < startDate)
+      return helpers.error("any.invalid");
+    return value;
+  }).messages({
+    "any.invalid": "תאריך סיום חייב להיות אחרי תאריך ההתחלה",
+  }),
   description: Joi.string().allow("").optional(),
   squareMeters: Joi.string().allow("").optional(),
   permitNumber: Joi.string().allow("").optional(),

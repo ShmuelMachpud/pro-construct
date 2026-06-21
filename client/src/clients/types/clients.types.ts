@@ -1,4 +1,4 @@
-type ClientType = "private" | "business";
+export type ClientType = "private" | "business";
 
 export interface Client {
   id: string;
