@@ -10,7 +10,7 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import { useNavigate } from "react-router-dom";
 import { useAllQuotes } from "../hooks/useAllQuotes";
 import { quoteStatusConfig } from "../helpers/quotes.helpers";
-import CreateQuoteModal from "../components/CreateQuoteModal";
+import { CreateQuoteModal } from "../components/CreateQuoteModal";
 import type { CreatePriceQuoteDto } from "../types/quotes.types";
 
 const QuotesPage = () => {

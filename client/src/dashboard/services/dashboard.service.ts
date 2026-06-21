@@ -8,6 +8,11 @@ export const getAllContractors = async (): Promise<UserInterface[]> => {
   return response.data.filter((u) => u.role === "contractor");
 };
 
+export const getContractorById = async (id: string): Promise<UserInterface> => {
+  const response = await axiosAuth.get<UserInterface>(`/users/${id}`);
+  return response.data;
+};
+
 export const getAllProjectsAdmin = async (): Promise<Project[]> => {
   const response = await axiosServer.get<Project[]>("/projects/all");
   return response.data;

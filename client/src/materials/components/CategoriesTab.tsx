@@ -3,7 +3,7 @@ import { Box, Button, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CategoryIcon from "@mui/icons-material/Category";
 import GenericTable from "../../global/components/GenericTable";
-import CategoryModal from "./CategoryModal";
+import { CategoryModal } from "./CategoryModal";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import { getCategoryColumns } from "../helpers/materials.columns";
 import { useCategories } from "../hooks/useCategories";

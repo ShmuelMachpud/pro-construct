@@ -15,6 +15,7 @@ import QuotesPage from "../quotes/pages/QuotesPage";
 import QuotePage from "../quotes/pages/QuotePage";
 import QuoteDetailPage from "../quotes/pages/QuoteDetailPage";
 import DashboardPage from "../dashboard/pages/DashboardPage";
+import ContractorPage from "../dashboard/pages/ContractorPage";
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +43,7 @@ export const router = createBrowserRouter([
         ),
         children: [
           { path: "dashboard", element: <DashboardPage /> },
+          { path: "contractors/:id", element: <ContractorPage /> },
           { path: "users", element: <UsersPage /> },
           { path: "materials", element: <MaterialsPage /> },
         ],

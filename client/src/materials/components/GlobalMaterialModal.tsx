@@ -1,14 +1,10 @@
-import { useState, useEffect } from "react";
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, TextField, MenuItem, Box, Grid,
 } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import type {
-  GlobalMaterial,
-  MaterialCategory,
-  CreateGlobalMaterialDto,
-} from "../types/materials.types";
+import { useGlobalMaterial } from "../hooks/useGlobalMaterial";
+import type { GlobalMaterial, MaterialCategory, CreateGlobalMaterialDto } from "../types/materials.types";
 
 interface Props {
   open: boolean;
@@ -18,56 +14,9 @@ interface Props {
   editItem?: GlobalMaterial | null;
 }
 
-const emptyForm: CreateGlobalMaterialDto = {
-  name: "",
-  categoryId: 0,
-  unit: "",
-  description: "",
-};
-
-const GlobalMaterialModal = ({ open, onClose, onSave, categories, editItem }: Props) => {
-  const [form, setForm] = useState<CreateGlobalMaterialDto>(emptyForm);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (editItem) {
-      setForm({
-        name: editItem.name,
-        categoryId: editItem.categoryId,
-        unit: editItem.unit,
-        description: editItem.description ?? "",
-      });
-    } else {
-      setForm(emptyForm);
-    }
-    setError("");
-  }, [editItem, open]);
-
-  const handleChange = (field: keyof CreateGlobalMaterialDto, value: string | number) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
-
-  const handleSubmit = async () => {
-    if (!form.name.trim()) { setError("שם חומר הוא שדה חובה"); return; }
-    if (!form.categoryId) { setError("יש לבחור קטגוריה"); return; }
-    if (!form.unit.trim()) { setError("יחידת מידה היא שדה חובה"); return; }
-    setLoading(true);
-    setError("");
-    try {
-      await onSave({
-        name: form.name.trim(),
-        categoryId: form.categoryId,
-        unit: form.unit.trim(),
-        description: form.description?.trim() || undefined,
-      });
-      onClose();
-    } catch (err: any) {
-      const msg = err?.response?.data?.message;
-      setError(msg ?? "שגיאה בשמירה, נסה שוב");
-    } finally {
-      setLoading(false);
-    }
-  };
+export const GlobalMaterialModal = ({ open, onClose, onSave, categories, editItem }: Props) => {
+  const { values, setValue, errors, onBlur, isValid, loading, serverError, handleSubmit } =
+    useGlobalMaterial(editItem, open, onSave, onClose);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth
@@ -84,8 +33,11 @@ const GlobalMaterialModal = ({ open, onClose, onSave, categories, editItem }: Pr
             <TextField
               label="שם חומר *"
               fullWidth
-              value={form.name}
-              onChange={(e) => handleChange("name", e.target.value)}
+              value={values.name}
+              onChange={(e) => setValue("name", e.target.value)}
+              onBlur={() => onBlur("name")}
+              error={!!errors.name}
+              helperText={errors.name}
             />
           </Grid>
 
@@ -94,11 +46,14 @@ const GlobalMaterialModal = ({ open, onClose, onSave, categories, editItem }: Pr
               select
               label="קטגוריה *"
               fullWidth
-              value={form.categoryId || ""}
-              onChange={(e) => handleChange("categoryId", Number(e.target.value))}
+              value={values.categoryId}
+              onChange={(e) => setValue("categoryId", e.target.value)}
+              onBlur={() => onBlur("categoryId")}
+              error={!!errors.categoryId}
+              helperText={errors.categoryId}
             >
               {categories.map((cat) => (
-                <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
+                <MenuItem key={cat.id} value={String(cat.id)}>{cat.name}</MenuItem>
               ))}
             </TextField>
           </Grid>
@@ -107,9 +62,12 @@ const GlobalMaterialModal = ({ open, onClose, onSave, categories, editItem }: Pr
             <TextField
               label="יחידת מידה *"
               fullWidth
-              placeholder="מ&quot;ר, מ&quot;ל, יח&apos;..."
-              value={form.unit}
-              onChange={(e) => handleChange("unit", e.target.value)}
+              placeholder='מ"ר, מ"ל, יח׳...'
+              value={values.unit}
+              onChange={(e) => setValue("unit", e.target.value)}
+              onBlur={() => onBlur("unit")}
+              error={!!errors.unit}
+              helperText={errors.unit}
             />
           </Grid>
 
@@ -119,18 +77,18 @@ const GlobalMaterialModal = ({ open, onClose, onSave, categories, editItem }: Pr
               fullWidth
               multiline
               rows={2}
-              value={form.description}
-              onChange={(e) => handleChange("description", e.target.value)}
+              value={values.description}
+              onChange={(e) => setValue("description", e.target.value)}
             />
           </Grid>
         </Grid>
 
-        {error && <Box sx={{ mt: 1.5, color: "error.main", fontSize: "0.875rem" }}>{error}</Box>}
+        {serverError && <Box sx={{ mt: 1.5, color: "error.main", fontSize: "0.875rem" }}>{serverError}</Box>}
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 3 }}>
         <Button onClick={onClose} color="inherit">ביטול</Button>
-        <Button variant="contained" onClick={handleSubmit} disabled={loading}>
+        <Button variant="contained" onClick={handleSubmit} disabled={loading || !isValid}>
           {loading ? "שומר..." : "שמור"}
         </Button>
       </DialogActions>
@@ -138,4 +96,3 @@ const GlobalMaterialModal = ({ open, onClose, onSave, categories, editItem }: Pr
   );
 };
 
-export default GlobalMaterialModal;

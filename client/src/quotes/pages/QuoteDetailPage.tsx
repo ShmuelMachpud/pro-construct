@@ -10,7 +10,7 @@ import { useQuoteItems } from "../hooks/useQuoteItems";
 import { useQuotes } from "../hooks/useQuotes";
 import { useContractorMaterials } from "../../materials/hooks/useContractorMaterials";
 import QuoteItemsTable from "../components/QuoteItemsTable";
-import AddQuoteItemModal from "../components/AddQuoteItemModal";
+import { AddQuoteItemModal } from "../components/AddQuoteItemModal";
 import { calcGrandTotal, formatCurrency, quoteStatusConfig } from "../helpers/quotes.helpers";
 import type { QuoteStatus } from "../types/quotes.types";
 

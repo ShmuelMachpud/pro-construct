@@ -3,7 +3,7 @@ import { Box, Button, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import GenericTable from "../../global/components/GenericTable";
-import GlobalMaterialModal from "./GlobalMaterialModal";
+import { GlobalMaterialModal } from "./GlobalMaterialModal";
 import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import { getGlobalMaterialColumns } from "../helpers/materials.columns";
 import { useGlobalMaterials } from "../hooks/useGlobalMaterials";

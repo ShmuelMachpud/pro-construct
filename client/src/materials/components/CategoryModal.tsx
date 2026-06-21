@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, TextField, Box,
 } from "@mui/material";
 import CategoryIcon from "@mui/icons-material/Category";
+import { useCategory } from "../hooks/useCategory";
 import type { MaterialCategory, CreateCategoryDto } from "../types/materials.types";
 
 interface Props {
@@ -13,39 +13,9 @@ interface Props {
   editItem?: MaterialCategory | null;
 }
 
-const emptyForm: CreateCategoryDto = { name: "", description: "" };
-
-const CategoryModal = ({ open, onClose, onSave, editItem }: Props) => {
-  const [form, setForm] = useState<CreateCategoryDto>(emptyForm);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (editItem) {
-      setForm({ name: editItem.name, description: editItem.description ?? "" });
-    } else {
-      setForm(emptyForm);
-    }
-    setError("");
-  }, [editItem, open]);
-
-  const handleChange = (field: keyof CreateCategoryDto, value: string) =>
-    setForm((prev) => ({ ...prev, [field]: value }));
-
-  const handleSubmit = async () => {
-    if (!form.name.trim()) { setError("שם קטגוריה הוא שדה חובה"); return; }
-    setLoading(true);
-    setError("");
-    try {
-      await onSave({ name: form.name.trim(), description: form.description?.trim() || undefined });
-      onClose();
-    } catch (err: any) {
-      const msg = err?.response?.data?.message;
-      setError(msg ?? "שגיאה בשמירה, נסה שוב");
-    } finally {
-      setLoading(false);
-    }
-  };
+export const CategoryModal = ({ open, onClose, onSave, editItem }: Props) => {
+  const { values, setValue, errors, onBlur, isValid, loading, serverError, handleSubmit } =
+    useCategory(editItem, open, onSave, onClose);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth
@@ -61,24 +31,27 @@ const CategoryModal = ({ open, onClose, onSave, editItem }: Props) => {
           <TextField
             label="שם קטגוריה *"
             fullWidth
-            value={form.name}
-            onChange={(e) => handleChange("name", e.target.value)}
+            value={values.name}
+            onChange={(e) => setValue("name", e.target.value)}
+            onBlur={() => onBlur("name")}
+            error={!!errors.name}
+            helperText={errors.name}
           />
           <TextField
             label="תיאור"
             fullWidth
             multiline
             rows={2}
-            value={form.description}
-            onChange={(e) => handleChange("description", e.target.value)}
+            value={values.description}
+            onChange={(e) => setValue("description", e.target.value)}
           />
         </Box>
-        {error && <Box sx={{ mt: 1.5, color: "error.main", fontSize: "0.875rem" }}>{error}</Box>}
+        {serverError && <Box sx={{ mt: 1.5, color: "error.main", fontSize: "0.875rem" }}>{serverError}</Box>}
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 3 }}>
         <Button onClick={onClose} color="inherit">ביטול</Button>
-        <Button variant="contained" onClick={handleSubmit} disabled={loading}>
+        <Button variant="contained" onClick={handleSubmit} disabled={loading || !isValid}>
           {loading ? "שומר..." : "שמור"}
         </Button>
       </DialogActions>
@@ -86,4 +59,3 @@ const CategoryModal = ({ open, onClose, onSave, editItem }: Props) => {
   );
 };
 
-export default CategoryModal;

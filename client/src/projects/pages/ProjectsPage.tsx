@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useProjects } from "../hooks/useProjects";
 import { useAuth } from "../../global/hooks/useAuth";
 import { statusConfig, typeLabels } from "../helpers/projects.helpers";
-import CreateProjectModal from "../components/CreateProjectModal";
+import { CreateProjectModal } from "../components/CreateProjectModal";
 
 const ProjectsPage = () => {
   const { isContractor } = useAuth();

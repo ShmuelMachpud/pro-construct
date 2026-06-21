@@ -1,15 +1,22 @@
 import { Box, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { useDashboard } from "../hooks/useDashboard";
 import StatsCards from "../components/StatsCards";
 import GenericTable from "../../global/components/GenericTable";
 import { contractorsColumns, projectsColumns } from "../helpers/dashboard.columns";
 import { useAuth } from "../../global/hooks/useAuth";
+import type { UserInterface } from "../../users/types/users.types";
 
 const DashboardPage = () => {
   const { data, loading, error } = useDashboard();
   const { isAdmin } = useAuth();
+  const navigate = useNavigate();
 
   if (error) return <Typography color="error">{error}</Typography>;
+
+  const handleContractorClick = (contractor: UserInterface) => {
+    navigate(`/contractors/${contractor.id}`);
+  };
 
   return (
     <Box>
@@ -17,7 +24,7 @@ const DashboardPage = () => {
         דשבורד {isAdmin ? "מנהל" : "אופרייטור"}
       </Typography>
 
-      <StatsCards stats={data.stats} />
+      <StatsCards stats={data.stats} loading={loading} />
 
       <Typography variant="h6" color="white" mb={2}>
         קבלנים
@@ -28,6 +35,7 @@ const DashboardPage = () => {
           rows={data.contractors}
           loading={loading}
           emptyMessage="אין קבלנים במערכת"
+          onRowClick={handleContractorClick}
         />
       </Box>
 

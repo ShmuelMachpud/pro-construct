@@ -11,28 +11,16 @@ interface Props {
   onCreated: () => void;
 }
 
-const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
-  const { values, setValue, errors, clients, loadingClients, loading, error, handleSubmit, handleClose } =
+export const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
+  const { values, setValue, setDateValue, errors, onBlur, isValid, clients, loadingClients, loading, serverError, handleSubmit, handleClose } =
     useCreateProject(open, onCreated, onClose);
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth="sm"
-      fullWidth
-      PaperProps={{
-        sx: {
-          backgroundColor: "#1E1E1E",
-          border: "1px solid rgba(255,107,0,0.2)",
-          borderRadius: 3,
-        },
-      }}
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth
+      PaperProps={{ sx: { backgroundColor: "#1E1E1E", border: "1px solid rgba(255,107,0,0.2)", borderRadius: 3 } }}
     >
       <DialogTitle>
-        <Typography variant="h6" fontWeight="bold" color="white">
-          פרויקט חדש
-        </Typography>
+        <Typography variant="h6" fontWeight="bold" color="white">פרויקט חדש</Typography>
       </DialogTitle>
 
       <DialogContent>
@@ -42,6 +30,7 @@ const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
             fullWidth
             value={values.name}
             onChange={(e) => setValue("name", e.target.value)}
+            onBlur={() => onBlur("name")}
             error={!!errors.name}
             helperText={errors.name}
           />
@@ -52,6 +41,7 @@ const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
             select
             value={values.type}
             onChange={(e) => setValue("type", e.target.value)}
+            onBlur={() => onBlur("type")}
             error={!!errors.type}
             helperText={errors.type}
           >
@@ -65,6 +55,7 @@ const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
             fullWidth
             value={values.location}
             onChange={(e) => setValue("location", e.target.value)}
+            onBlur={() => onBlur("location")}
             error={!!errors.location}
             helperText={errors.location}
           />
@@ -75,6 +66,7 @@ const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
             select
             value={values.clientId}
             onChange={(e) => setValue("clientId", e.target.value)}
+            onBlur={() => onBlur("clientId")}
             error={!!errors.clientId}
             helperText={errors.clientId}
             disabled={loadingClients}
@@ -103,7 +95,7 @@ const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
             fullWidth
             type="date"
             value={values.startDate}
-            onChange={(e) => setValue("startDate", e.target.value)}
+            onChange={(e) => setDateValue("startDate", e.target.value)}
             slotProps={{ inputLabel: { shrink: true } }}
           />
 
@@ -112,7 +104,9 @@ const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
             fullWidth
             type="date"
             value={values.endDate}
-            onChange={(e) => setValue("endDate", e.target.value)}
+            onChange={(e) => setDateValue("endDate", e.target.value)}
+            error={!!errors.endDate}
+            helperText={errors.endDate}
             slotProps={{ inputLabel: { shrink: true } }}
           />
 
@@ -126,7 +120,7 @@ const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
           />
 
           <TextField
-            label="מ״ר"
+            label='מ"ר'
             fullWidth
             type="number"
             value={values.squareMeters}
@@ -149,19 +143,15 @@ const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
             onChange={(e) => setValue("notes", e.target.value)}
           />
 
-          {error && (
-            <Typography color="error" fontSize="0.9rem">
-              {error}
-            </Typography>
+          {serverError && (
+            <Typography color="error" fontSize="0.9rem">{serverError}</Typography>
           )}
         </Box>
       </DialogContent>
 
       <DialogActions sx={{ p: 3, pt: 0 }}>
-        <Button onClick={handleClose} sx={{ color: "grey.400" }}>
-          ביטול
-        </Button>
-        <Button variant="contained" onClick={handleSubmit} disabled={loading}>
+        <Button onClick={handleClose} sx={{ color: "grey.400" }}>ביטול</Button>
+        <Button variant="contained" onClick={handleSubmit} disabled={loading || !isValid}>
           {loading ? "יוצר..." : "צור פרויקט"}
         </Button>
       </DialogActions>
@@ -169,4 +159,3 @@ const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
   );
 };
 
-export default CreateProjectModal;

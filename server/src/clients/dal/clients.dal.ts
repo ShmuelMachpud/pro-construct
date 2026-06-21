@@ -11,6 +11,10 @@ export const findAllClientsDal = async (userId: string) => {
   });
 };
 
+export const findClientsByContractorDal = async (contractorId: string) => {
+  return await repository.find({ where: { contractorId }, order: { createdAt: "DESC" } });
+};
+
 export const findClientByIdDal = async (id: string, userId: string) => {
   return await repository.findOne({ where: { id, contractorId: userId } });
 };

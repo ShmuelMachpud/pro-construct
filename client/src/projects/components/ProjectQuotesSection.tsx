@@ -9,7 +9,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import { useNavigate } from "react-router-dom";
 import { useQuotes } from "../../quotes/hooks/useQuotes";
-import CreateQuoteModal from "../../quotes/components/CreateQuoteModal";
+import { CreateQuoteModal } from "../../quotes/components/CreateQuoteModal";
 import { quoteStatusConfig } from "../../quotes/helpers/quotes.helpers";
 import type { CreatePriceQuoteDto } from "../../quotes/types/quotes.types";
 

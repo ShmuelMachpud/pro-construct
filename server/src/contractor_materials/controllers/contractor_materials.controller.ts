@@ -9,6 +9,19 @@ import {
   removeContractorMaterialService,
 } from "../services/contractor_materials.service";
 
+export const getContractorMaterialsByContractorController = async (
+  req: AuthRequest,
+  res: Response,
+) => {
+  try {
+    const { contractorId } = req.params;
+    const items = await getAllContractorMaterialsService(contractorId as string);
+    res.status(200).json(items);
+  } catch (error) {
+    handleError(error, res);
+  }
+};
+
 export const getAllContractorMaterialsController = async (
   req: AuthRequest,
   res: Response,

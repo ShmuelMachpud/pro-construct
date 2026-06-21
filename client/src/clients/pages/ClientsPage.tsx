@@ -11,7 +11,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useNavigate } from "react-router-dom";
 import type { Client } from "../types/clients.types";
 import { getClients } from "../services/client.service";
-import CreateClientModal from "../components/CreateClientModal";
+import { CreateClientModal } from "../components/CreateClientModal";
 import { useAuth } from "../../global/hooks/useAuth";
 
 const ClientsPage = () => {

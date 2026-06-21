@@ -7,30 +7,45 @@ import type { Client } from "../../clients/types/clients.types";
 import type { CreateProjectFormType, ProjectType, ProjectStatus } from "../types/projects.types";
 
 export const useCreateProject = (open: boolean, onCreated: () => void, onClose: () => void) => {
-  const { values, setValue, errors, validate, reset } = useForm<CreateProjectFormType>(createProjectInitialData);
+  const { values, setValue, errors, setFieldError, onBlur, isValid, validate, reset } =
+    useForm<CreateProjectFormType>(createProjectInitialData, createProjectSchema);
+
+  const validateDateRange = (startDate: string, endDate: string) => {
+    if (startDate && endDate && endDate < startDate)
+      setFieldError("endDate", "תאריך סיום חייב להיות אחרי תאריך ההתחלה");
+    else
+      setFieldError("endDate", undefined);
+  };
+
+  const setDateValue = (field: "startDate" | "endDate", value: string) => {
+    setValue(field, value);
+    const start = field === "startDate" ? value : values.startDate;
+    const end = field === "endDate" ? value : values.endDate;
+    validateDateRange(start, end);
+  };
   const [clients, setClients] = useState<Client[]>([]);
   const [loadingClients, setLoadingClients] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
 
   useEffect(() => {
     if (!open) return;
     setLoadingClients(true);
     getClients()
       .then(setClients)
-      .catch(() => setError("שגיאה בטעינת רשימת הלקוחות"))
+      .catch(() => setServerError("שגיאה בטעינת רשימת הלקוחות"))
       .finally(() => setLoadingClients(false));
   }, [open]);
 
   const handleClose = () => {
     reset();
-    setError("");
+    setServerError("");
     onClose();
   };
 
   const handleSubmit = async () => {
-    if (!validate(createProjectSchema)) return;
-    setError("");
+    if (!validate()) return;
+    setServerError("");
     setLoading(true);
     try {
       await createProject({
@@ -49,11 +64,11 @@ export const useCreateProject = (open: boolean, onCreated: () => void, onClose: 
       onCreated();
       handleClose();
     } catch {
-      setError("אירעה שגיאה ביצירת הפרויקט");
+      setServerError("אירעה שגיאה ביצירת הפרויקט");
     } finally {
       setLoading(false);
     }
   };
 
-  return { values, setValue, errors, clients, loadingClients, loading, error, handleSubmit, handleClose };
+  return { values, setValue, setDateValue, errors, onBlur, isValid, clients, loadingClients, loading, serverError, handleSubmit, handleClose };
 };

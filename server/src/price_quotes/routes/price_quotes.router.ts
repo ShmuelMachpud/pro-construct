@@ -1,6 +1,8 @@
 import { Router } from "express";
-import { authenticate } from "../../middleware/auth.middleware";
+import { authenticate, authorize } from "../../middleware/auth.middleware";
+import { UserRole } from "../../types/auth.types";
 import {
+  getQuotesByContractorAdminController,
   getAllQuotesByContractorController,
   getAllPriceQuotesController,
   getPriceQuoteByIdController,
@@ -11,6 +13,7 @@ import {
 
 export const allQuotesRouter = Router();
 allQuotesRouter.use(authenticate);
+allQuotesRouter.get("/contractor/:contractorId", authorize(UserRole.ADMIN, UserRole.OPERATOR), getQuotesByContractorAdminController);
 allQuotesRouter.get("/", getAllQuotesByContractorController);
 
 export const priceQuotesRouter = Router({ mergeParams: true });
