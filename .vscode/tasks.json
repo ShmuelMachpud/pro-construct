@@ -2,52 +2,56 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "dev: auth-service",
+      "label": "auth-service",
       "type": "shell",
-      "command": "cd ./auth-service && npm i && npm run dev",
+      "command": "cd auth-service; npm i; npm run build; npm run dev",
+      "problemMatcher": [],
+      "icon": {"color": "terminal.ansiMagenta", "id": "server-environment"},
       "isBackground": true,
-      "problemMatcher": {
-        "pattern": { "regexp": "^$" },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "starting|compiling",
-          "endsPattern": "Server running on port"
+      "presentation": {},
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "powershell.exe",
+          "args": ["-NoExit", "-Command"]
         }
-      },
+      }
     },
     {
-      "label": "dev: server",
+      "label": "server",
       "type": "shell",
-      "command": "cd ./server && npm i && npm run dev",
+      "command": "cd server; npm i; npm run build; npm run dev",
+      "problemMatcher": [],
+      "icon": {"color": "terminal.ansiMagenta", "id": "server-environment"},
       "isBackground": true,
-      "problemMatcher": {
-        "pattern": { "regexp": "^$" },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "starting|compiling",
-          "endsPattern": "Server running on port"
+      "presentation":{} ,
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "powershell.exe",
+          "args": ["-NoExit", "-Command"]
         }
-      },
+      }
     },
     {
-      "label": "dev: client",
+      "label": "client",
       "type": "shell",
-      "command": "cd ./client && npm i && npm run dev",
-      "isBackground": true,
-      "problemMatcher": {
-        "pattern": { "regexp": "^$" },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "starting|compiling",
-          "endsPattern": "➜  Local:"
+      "command": "cd client; npm i; npm run build; npm run dev",
+      "problemMatcher": [],
+      "icon": {"color": "terminal.ansiMagenta", "id": "server-environment"},
+      "presentation":{} ,
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "shell": {
+          "executable": "powershell.exe",
+          "args": ["-NoExit", "-Command"]
         }
-      },
+      }
     },
     {
-      "label": "dev: all",
-      "dependsOn": ["dev: auth-service", "dev: server", "dev: client"],
-      "dependsOrder": "parallel",
-      "group": { "kind": "build", "isDefault": true }
+      "label": "all-servers",
+      "dependsOn": ["auth-service", "server", "client"],
+      "group": {"kind": "build", "isDefault": true}
     }
   ]
 }
