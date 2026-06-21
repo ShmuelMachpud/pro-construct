@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  Box, Button, Typography, Card, CardContent, Grid, Chip,
+  Box, Button, Typography, Card, CardContent, Grid, Chip, CircularProgress,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import PersonIcon from "@mui/icons-material/Person";
@@ -18,9 +18,13 @@ const ClientsPage = () => {
   const { isContractor } = useAuth();
   const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
 
-  const load = () => getClients().then(setClients);
+  const load = () => {
+    setLoading(true);
+    getClients().then(setClients).finally(() => setLoading(false));
+  };
 
   useEffect(() => { load(); }, []);
 
@@ -35,7 +39,11 @@ const ClientsPage = () => {
         )}
       </Box>
 
-      {clients.length === 0 ? (
+      {loading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+          <CircularProgress color="primary" />
+        </Box>
+      ) : clients.length === 0 ? (
         <Box sx={{ textAlign: "center", mt: 10, color: "grey.600" }}>
           <PersonIcon sx={{ fontSize: 64, mb: 2 }} />
           <Typography>אין לקוחות עדיין. הוסף לקוח חדש להתחיל.</Typography>

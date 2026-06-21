@@ -1,6 +1,7 @@
-import { Box, Button, Typography, Card, CardContent, Chip, Grid } from "@mui/material";
+import { Box, Button, Typography, Card, CardContent, Chip, Grid, CircularProgress } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import FolderIcon from "@mui/icons-material/Folder";
+import FolderOpenIcon from "@mui/icons-material/FolderOpen";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +13,7 @@ import CreateProjectModal from "../components/CreateProjectModal";
 const ProjectsPage = () => {
   const { isContractor } = useAuth();
   const navigate = useNavigate();
-  const { projects, fetchProjects } = useProjects();
+  const { projects, loading, fetchProjects } = useProjects();
   const [openCreateModal, setOpenCreateModal] = useState(false);
 
   return (
@@ -26,6 +27,16 @@ const ProjectsPage = () => {
         )}
       </Box>
 
+      {loading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+          <CircularProgress color="primary" />
+        </Box>
+      ) : projects.length === 0 ? (
+        <Box sx={{ textAlign: "center", mt: 10, color: "grey.600" }}>
+          <FolderOpenIcon sx={{ fontSize: 64, mb: 2 }} />
+          <Typography>אין פרויקטים עדיין. הוסף פרויקט חדש להתחיל.</Typography>
+        </Box>
+      ) : (
       <Grid container spacing={3}>
         {projects.map((project) => {
           const status = statusConfig[project.status];
@@ -74,6 +85,7 @@ const ProjectsPage = () => {
           );
         })}
       </Grid>
+      )}
 
       {isContractor && (
         <CreateProjectModal
