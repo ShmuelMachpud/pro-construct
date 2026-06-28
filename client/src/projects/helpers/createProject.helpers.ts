@@ -1,5 +1,9 @@
 import Joi from "joi";
-import type { CreateProjectFormType, ProjectType, ProjectStatus } from "../types/projects.types";
+import type {
+  CreateProjectFormType,
+  ProjectType,
+  ProjectStatus,
+} from "../types/projects.types";
 
 export const projectTypeOptions: { value: ProjectType; label: string }[] = [
   { value: "construction", label: "בנייה חדשה" },
@@ -16,7 +20,7 @@ export const createProjectInitialData: CreateProjectFormType = {
   name: "",
   type: "",
   location: "",
-  clientId: "",
+  customerId: "",
   status: "",
   startDate: "",
   endDate: "",
@@ -40,21 +44,30 @@ export const createProjectSchema = Joi.object<CreateProjectFormType>({
     "string.empty": "מיקום הוא שדה חובה",
     "any.required": "מיקום הוא שדה חובה",
   }),
-  clientId: Joi.string().required().messages({
+  customerId: Joi.string().required().messages({
     "string.empty": "יש לבחור לקוח",
     "any.required": "יש לבחור לקוח",
   }),
-  status: Joi.string().valid("planning", "in_progress", "completed").allow("").optional(),
+  status: Joi.string()
+    .valid("planning", "in_progress", "completed")
+    .allow("")
+    .optional(),
   startDate: Joi.string().allow("").optional(),
-  endDate: Joi.string().allow("").optional().custom((value, helpers) => {
-    const parent = helpers.state.ancestors[0] as CreateProjectFormType | undefined;
-    const startDate = parent?.startDate;
-    if (value && startDate && value < startDate)
-      return helpers.error("any.invalid");
-    return value;
-  }).messages({
-    "any.invalid": "תאריך סיום חייב להיות אחרי תאריך ההתחלה",
-  }),
+  endDate: Joi.string()
+    .allow("")
+    .optional()
+    .custom((value, helpers) => {
+      const parent = helpers.state.ancestors[0] as
+        | CreateProjectFormType
+        | undefined;
+      const startDate = parent?.startDate;
+      if (value && startDate && value < startDate)
+        return helpers.error("any.invalid");
+      return value;
+    })
+    .messages({
+      "any.invalid": "תאריך סיום חייב להיות אחרי תאריך ההתחלה",
+    }),
   description: Joi.string().allow("").optional(),
   squareMeters: Joi.string().allow("").optional(),
   permitNumber: Joi.string().allow("").optional(),

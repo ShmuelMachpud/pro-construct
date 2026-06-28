@@ -1,6 +1,6 @@
 import { DataSource } from "typeorm";
 import { ENV } from "./environments";
-import { Client } from "../clients/model/client.entity";
+import { Customer } from "../customers/model/customer.entity";
 import { Project } from "../projects/model/project.entity";
 import { MaterialCategory } from "../material_categories/model/material_category.entity";
 import { GlobalMaterial } from "../global_materials/model/global_material.entity";
@@ -15,7 +15,7 @@ export const AppDataSource = new DataSource({
   synchronize: process.env.NODE_ENV === "development",
   logging: false,
   entities: [
-    Client,
+    Customer,
     Project,
     MaterialCategory,
     GlobalMaterial,

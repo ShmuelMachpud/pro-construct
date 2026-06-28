@@ -7,20 +7,21 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import { Construction } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { ROUTES } from "../routes/model/routes.model";
 
 const DRAWER_WIDTH = 240;
 
 const adminMenuItems = [
-  { label: "דשבורד", icon: <BarChartIcon />, path: "/dashboard" },
-  { label: "משתמשים", icon: <PeopleIcon />, path: "/users" },
-  { label: "ניהול חומרים", icon: <InventoryIcon />, path: "/materials" },
+  { label: "דשבורד", icon: <BarChartIcon />, path: ROUTES.DASHBOARD },
+  { label: "משתמשים", icon: <PeopleIcon />, path: ROUTES.USERS },
+  { label: "ניהול חומרים", icon: <InventoryIcon />, path: ROUTES.MATERIALS },
 ];
 
 const contractorMenuItems = [
-  { label: "פרויקטים", icon: <FolderIcon />, path: "/projects" },
-  { label: "לקוחות", icon: <PeopleIcon />, path: "/clients" },
-  { label: "החומרים שלי", icon: <InventoryIcon />, path: "/my-materials" },
-  { label: "הצעות מחיר", icon: <ReceiptIcon />, path: "/quotes" },
+  { label: "פרויקטים", icon: <FolderIcon />, path: ROUTES.PROJECTS },
+  { label: "לקוחות", icon: <PeopleIcon />, path: ROUTES.CUSTOMERS },
+  { label: "החומרים שלי", icon: <InventoryIcon />, path: ROUTES.MY_MATERIALS },
+  { label: "הצעות מחיר", icon: <ReceiptIcon />, path: ROUTES.QUOTES },
 ];
 
 const Sidebar = () => {

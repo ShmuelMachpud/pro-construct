@@ -5,7 +5,7 @@ import {
   getAllProjectsController,
   getProjectsByContractorAdminController,
   getProjectsByContractorController,
-  getProjectsByClientController,
+  getProjectsByCustomerController,
   getProjectByIdController,
   createProjectController,
   updateProjectController,
@@ -16,11 +16,31 @@ export const projectsRouter = Router();
 
 projectsRouter.use(authenticate);
 
-projectsRouter.get("/all", authorize(UserRole.ADMIN, UserRole.OPERATOR), getAllProjectsController);
-projectsRouter.get("/contractor/:contractorId", authorize(UserRole.ADMIN, UserRole.OPERATOR), getProjectsByContractorAdminController);
+projectsRouter.get(
+  "/all",
+  authorize(UserRole.ADMIN, UserRole.OPERATOR),
+  getAllProjectsController,
+);
+projectsRouter.get(
+  "/contractor/:contractorId",
+  authorize(UserRole.ADMIN, UserRole.OPERATOR),
+  getProjectsByContractorAdminController,
+);
 projectsRouter.get("/", getProjectsByContractorController);
-projectsRouter.get("/client/:clientId", getProjectsByClientController);
+projectsRouter.get("/customer/:customerId", getProjectsByCustomerController);
 projectsRouter.get("/:id", getProjectByIdController);
-projectsRouter.post("/", createProjectController);
-projectsRouter.put("/:id", updateProjectController);
-projectsRouter.delete("/:id", removeProjectController);
+projectsRouter.post(
+  "/",
+  authorize(UserRole.CONTRACTOR),
+  createProjectController,
+);
+projectsRouter.put(
+  "/:id",
+  authorize(UserRole.CONTRACTOR),
+  updateProjectController,
+);
+projectsRouter.delete(
+  "/:id",
+  authorize(UserRole.CONTRACTOR),
+  removeProjectController,
+);

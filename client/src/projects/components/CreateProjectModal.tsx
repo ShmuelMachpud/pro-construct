@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
-  const { values, setValue, setDateValue, errors, onBlur, isValid, clients, loadingClients, loading, serverError, handleSubmit, handleClose } =
+  const { values, setValue, setDateValue, errors, onBlur, isValid, customers, loadingCustomers, loading, serverError, handleSubmit, handleClose } =
     useCreateProject(open, onCreated, onClose);
 
   return (
@@ -64,15 +64,15 @@ export const CreateProjectModal = ({ open, onClose, onCreated }: Props) => {
             label="לקוח *"
             fullWidth
             select
-            value={values.clientId}
-            onChange={(e) => setValue("clientId", e.target.value)}
-            onBlur={() => onBlur("clientId")}
-            error={!!errors.clientId}
-            helperText={errors.clientId}
-            disabled={loadingClients}
-            slotProps={loadingClients ? { input: { endAdornment: <CircularProgress size={18} /> } } : undefined}
+            value={values.customerId}
+            onChange={(e) => setValue("customerId", e.target.value)}
+            onBlur={() => onBlur("customerId")}
+            error={!!errors.customerId}
+            helperText={errors.customerId}
+            disabled={loadingCustomers}
+            slotProps={loadingCustomers ? { input: { endAdornment: <CircularProgress size={18} /> } } : undefined}
           >
-            {clients.map((c) => (
+            {customers.map((c) => (
               <MenuItem key={c.id} value={String(c.id)}>{c.name}</MenuItem>
             ))}
           </TextField>

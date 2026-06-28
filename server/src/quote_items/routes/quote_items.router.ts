@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { authenticate } from "../../middleware/auth.middleware";
+import { authenticate, authorize } from "../../middleware/auth.middleware";
+import { UserRole } from "../../types/auth.types";
 import {
   getAllQuoteItemsController,
   getQuoteItemByIdController,
@@ -14,6 +15,6 @@ quoteItemsRouter.use(authenticate);
 
 quoteItemsRouter.get("/", getAllQuoteItemsController);
 quoteItemsRouter.get("/:itemId", getQuoteItemByIdController);
-quoteItemsRouter.post("/", addQuoteItemController);
-quoteItemsRouter.patch("/:itemId", updateQuoteItemController);
-quoteItemsRouter.delete("/:itemId", removeQuoteItemController);
+quoteItemsRouter.post("/", authorize(UserRole.CONTRACTOR), addQuoteItemController);
+quoteItemsRouter.patch("/:itemId", authorize(UserRole.CONTRACTOR), updateQuoteItemController);
+quoteItemsRouter.delete("/:itemId", authorize(UserRole.CONTRACTOR), removeQuoteItemController);

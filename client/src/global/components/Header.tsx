@@ -1,13 +1,14 @@
 import { AppBar, Toolbar, Typography, IconButton, Box, Tooltip } from "@mui/material";
 import { Logout, AccountCircle } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../routes/model/routes.model";
 
 const Header = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate(`/${ROUTES.LOGIN}`);
   };
 
   return (

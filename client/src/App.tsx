@@ -1,5 +1,5 @@
 import { RouterProvider } from "react-router-dom";
-import { router } from "./global/router";
+import { router } from "./global/routes/router";
 
 function App() {
   return <RouterProvider router={router} />;

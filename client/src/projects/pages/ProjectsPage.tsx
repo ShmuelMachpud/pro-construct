@@ -9,6 +9,7 @@ import { useProjects } from "../hooks/useProjects";
 import { useAuth } from "../../global/hooks/useAuth";
 import { statusConfig, typeLabels } from "../helpers/projects.helpers";
 import { CreateProjectModal } from "../components/CreateProjectModal";
+import { ROUTES } from "../../global/routes/model/routes.model";
 
 const ProjectsPage = () => {
   const { isContractor } = useAuth();
@@ -43,7 +44,7 @@ const ProjectsPage = () => {
           return (
             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={project.id}>
               <Card
-                onClick={() => navigate(`/projects/${project.id}`)}
+                onClick={() => navigate(`/${ROUTES.PROJECTS}/${project.id}`)}
                 sx={{
                   backgroundColor: "#1E1E1E",
                   border: "1px solid rgba(255,107,0,0.15)",

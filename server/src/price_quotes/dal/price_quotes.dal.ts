@@ -1,17 +1,24 @@
 import { AppDataSource } from "../../config/database";
-import { Client } from "../../clients/model/client.entity";
+import { Customer } from "../../customers/model/customer.entity";
 import { Project } from "../../projects/model/project.entity";
 import { PriceQuote } from "../model/price_quote.entity";
-import { CreatePriceQuoteDto, PriceQuoteWithProject, UpdatePriceQuoteDto, UpdatePriceQuoteInternalDto } from "../types/price_quotes.types";
+import {
+  CreatePriceQuoteDto,
+  PriceQuoteWithProject,
+  UpdatePriceQuoteDto,
+  UpdatePriceQuoteInternalDto,
+} from "../types/price_quotes.types";
 
 const repository = AppDataSource.getRepository(PriceQuote);
 
-export const findAllQuotesByContractorDal = async (contractorId: string): Promise<PriceQuoteWithProject[]> => {
+export const findAllQuotesByContractorDal = async (
+  contractorId: string,
+): Promise<PriceQuoteWithProject[]> => {
   return await repository
     .createQueryBuilder("quote")
     .innerJoin(Project, "project", "project.id = quote.projectId")
-    .innerJoin(Client, "client", "client.id = project.clientId")
-    .where("client.contractorId = :contractorId", { contractorId })
+    .innerJoin(Customer, "customer", "customer.id = project.customerId")
+    .where("customer.contractorId = :contractorId", { contractorId })
     .select([
       "quote.id AS id",
       'quote.projectId AS "projectId"',
@@ -38,7 +45,10 @@ export const findPriceQuoteByIdDal = async (id: number, projectId: string) => {
   return await repository.findOne({ where: { id, projectId } });
 };
 
-export const insertPriceQuoteDal = async (projectId: string, dto: CreatePriceQuoteDto) => {
+export const insertPriceQuoteDal = async (
+  projectId: string,
+  dto: CreatePriceQuoteDto,
+) => {
   const quote = repository.create({ projectId, ...dto });
   return await repository.save(quote);
 };

@@ -15,7 +15,7 @@ export class Project {
 
   @Index()
   @Column({ type: "uuid" })
-  clientId: string;
+  customerId: string;
 
   @Column()
   name: string;
@@ -23,7 +23,11 @@ export class Project {
   @Column({ type: "enum", enum: ProjectType })
   type: ProjectType;
 
-  @Column({ type: "enum", enum: ProjectStatus, default: ProjectStatus.PLANNING })
+  @Column({
+    type: "enum",
+    enum: ProjectStatus,
+    default: ProjectStatus.PLANNING,
+  })
   status: ProjectStatus;
 
   @Column()
