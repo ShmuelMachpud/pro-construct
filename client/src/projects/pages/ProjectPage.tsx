@@ -10,6 +10,7 @@ import { useProject } from "../hooks/useProject";
 import { statusConfig, typeLabels } from "../helpers/projects.helpers";
 import { projectTypeOptions, projectStatusOptions } from "../helpers/createProject.helpers";
 import ProjectQuotesSection from "../components/ProjectQuotesSection";
+import { ROUTES } from "../../global/routes/model/routes.model";
 
 const ProjectPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -29,7 +30,7 @@ const ProjectPage = () => {
       {/* Header */}
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 4 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/projects")} sx={{ color: "grey.400" }}>
+          <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(`/${ROUTES.PROJECTS}`)} sx={{ color: "grey.400" }}>
             פרויקטים
           </Button>
           <Typography variant="h5" fontWeight="bold" color="white">{project.name}</Typography>

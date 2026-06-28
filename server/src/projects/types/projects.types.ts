@@ -10,7 +10,7 @@ export enum ProjectStatus {
 }
 
 export interface CreateProjectDto {
-  clientId: string;
+  customerId: string;
   name: string;
   type: ProjectType;
   location: string;

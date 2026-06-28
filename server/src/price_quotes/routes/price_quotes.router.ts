@@ -22,6 +22,6 @@ priceQuotesRouter.use(authenticate);
 
 priceQuotesRouter.get("/", getAllPriceQuotesController);
 priceQuotesRouter.get("/:quoteId", getPriceQuoteByIdController);
-priceQuotesRouter.post("/", createPriceQuoteController);
-priceQuotesRouter.patch("/:quoteId", updatePriceQuoteController);
-priceQuotesRouter.delete("/:quoteId", removePriceQuoteController);
+priceQuotesRouter.post("/", authorize(UserRole.CONTRACTOR), createPriceQuoteController);
+priceQuotesRouter.patch("/:quoteId", authorize(UserRole.CONTRACTOR), updatePriceQuoteController);
+priceQuotesRouter.delete("/:quoteId", authorize(UserRole.CONTRACTOR), removePriceQuoteController);

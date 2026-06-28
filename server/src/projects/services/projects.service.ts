@@ -3,7 +3,7 @@ import { CreateProjectDto, UpdateProjectDto } from "../types/projects.types";
 import {
   findAllProjectsDal,
   findProjectsByContractorDal,
-  findProjectsByClientDal,
+  findProjectsByCustomerDal,
   findProjectByIdDal,
   findProjectByIdAndContractorDal,
   insertProjectDal,
@@ -27,9 +27,9 @@ export const getProjectsByContractorService = async (contractorId: string) => {
   }
 };
 
-export const getProjectsByClientService = async (clientId: string) => {
+export const getProjectsByCustomerService = async (customerId: string) => {
   try {
-    return await findProjectsByClientDal(clientId);
+    return await findProjectsByCustomerDal(customerId);
   } catch (error) {
     return Promise.reject(error);
   }
@@ -66,7 +66,10 @@ export const createProjectService = async (dto: CreateProjectDto) => {
   }
 };
 
-export const updateProjectService = async (id: string, dto: UpdateProjectDto) => {
+export const updateProjectService = async (
+  id: string,
+  dto: UpdateProjectDto,
+) => {
   try {
     const item = await updateProjectByIdDal(id, dto);
     if (!item) throw new CustomError("Project not found", 404);

@@ -4,7 +4,7 @@ export type ProjectStatus = "planning" | "in_progress" | "completed";
 
 export interface Project {
   id: string;
-  clientId: string;
+  customerId: string;
   name: string;
   type: ProjectType;
   status: ProjectStatus;
@@ -20,7 +20,7 @@ export interface Project {
 }
 
 export interface CreateProjectDto {
-  clientId: string;
+  customerId: string;
   name: string;
   type: ProjectType;
   location: string;
@@ -63,7 +63,7 @@ export type CreateProjectFormType = {
   name: string;
   type: string;
   location: string;
-  clientId: string;
+  customerId: string;
   status: string;
   startDate: string;
   endDate: string;

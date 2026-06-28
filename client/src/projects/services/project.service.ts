@@ -15,10 +15,10 @@ export const getProjectById = async (id: string): Promise<Project> => {
   return data;
 };
 
-export const getProjectsByClient = async (
-  clientId: string,
+export const getProjectsByCustomer = async (
+  customerId: string,
 ): Promise<Project[]> => {
-  const { data } = await axiosInstance.get(`/projects/client/${clientId}`);
+  const { data } = await axiosInstance.get(`/projects/customer/${customerId}`);
   return data;
 };
 

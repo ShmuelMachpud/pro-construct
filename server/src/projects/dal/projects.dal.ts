@@ -1,5 +1,5 @@
 import { AppDataSource } from "../../config/database";
-import { Client } from "../../clients/model/client.entity";
+import { Customer } from "../../customers/model/customer.entity";
 import { Project } from "../model/project.entity";
 import { CreateProjectDto, UpdateProjectDto } from "../types/projects.types";
 
@@ -12,14 +12,17 @@ export const findAllProjectsDal = async () => {
 export const findProjectsByContractorDal = async (contractorId: string) => {
   return await repository
     .createQueryBuilder("project")
-    .innerJoin(Client, "client", "client.id = project.clientId")
-    .where("client.contractorId = :contractorId", { contractorId })
+    .innerJoin(Customer, "customer", "customer.id = project.customerId")
+    .where("customer.contractorId = :contractorId", { contractorId })
     .orderBy("project.createdAt", "DESC")
     .getMany();
 };
 
-export const findProjectsByClientDal = async (clientId: string) => {
-  return await repository.find({ where: { clientId }, order: { createdAt: "DESC" } });
+export const findProjectsByCustomerDal = async (customerId: string) => {
+  return await repository.find({
+    where: { customerId },
+    order: { createdAt: "DESC" },
+  });
 };
 
 export const findProjectByIdDal = async (id: string) => {
@@ -32,9 +35,9 @@ export const findProjectByIdAndContractorDal = async (
 ) => {
   return await repository
     .createQueryBuilder("project")
-    .innerJoin(Client, "client", "client.id = project.clientId")
+    .innerJoin(Customer, "customer", "customer.id = project.customerId")
     .where("project.id = :id", { id })
-    .andWhere("client.contractorId = :contractorId", { contractorId })
+    .andWhere("customer.contractorId = :contractorId", { contractorId })
     .getOne();
 };
 
@@ -43,7 +46,10 @@ export const insertProjectDal = async (data: CreateProjectDto) => {
   return await repository.save(item);
 };
 
-export const updateProjectByIdDal = async (id: string, data: UpdateProjectDto) => {
+export const updateProjectByIdDal = async (
+  id: string,
+  data: UpdateProjectDto,
+) => {
   await repository.update(id, data);
   return await repository.findOne({ where: { id } });
 };
