@@ -8,14 +8,14 @@ import {
 } from "../services/contractor.admin.service";
 import type { UserInterface } from "../../users/types/users.types";
 import type { Project } from "../../projects/types/projects.types";
-import type { Client } from "../../clients/types/clients.types";
+import type { Customer } from "../../customers/types/customers.types";
 import type { ContractorMaterial } from "../../materials/types/materials.types";
 import type { PriceQuoteWithProject } from "../../quotes/types/quotes.types";
 
 interface ContractorDetail {
   contractor: UserInterface | null;
   projects: Project[];
-  clients: Client[];
+  clients: Customer[];
   materials: ContractorMaterial[];
   quotes: PriceQuoteWithProject[];
 }
@@ -35,14 +35,19 @@ export const useContractorDetail = (contractorId: string) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [contractorResult, projectsResult, clientsResult, materialsResult, quotesResult] =
-        await Promise.allSettled([
-          getContractorById(contractorId),
-          getContractorProjects(contractorId),
-          getContractorClients(contractorId),
-          getContractorMaterials(contractorId),
-          getContractorQuotes(contractorId),
-        ]);
+      const [
+        contractorResult,
+        projectsResult,
+        clientsResult,
+        materialsResult,
+        quotesResult,
+      ] = await Promise.allSettled([
+        getContractorById(contractorId),
+        getContractorProjects(contractorId),
+        getContractorClients(contractorId),
+        getContractorMaterials(contractorId),
+        getContractorQuotes(contractorId),
+      ]);
 
       if (contractorResult.status === "rejected") {
         setError("קבלן לא נמצא");
@@ -52,9 +57,12 @@ export const useContractorDetail = (contractorId: string) => {
 
       setData({
         contractor: contractorResult.value,
-        projects: projectsResult.status === "fulfilled" ? projectsResult.value : [],
-        clients: clientsResult.status === "fulfilled" ? clientsResult.value : [],
-        materials: materialsResult.status === "fulfilled" ? materialsResult.value : [],
+        projects:
+          projectsResult.status === "fulfilled" ? projectsResult.value : [],
+        clients:
+          clientsResult.status === "fulfilled" ? clientsResult.value : [],
+        materials:
+          materialsResult.status === "fulfilled" ? materialsResult.value : [],
         quotes: quotesResult.status === "fulfilled" ? quotesResult.value : [],
       });
       setLoading(false);
