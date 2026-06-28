@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from "typeorm";
 import { QuoteStatus } from "../types/price_quotes.types";
 
@@ -12,6 +13,7 @@ export class PriceQuote {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index()
   @Column({ type: "uuid" })
   projectId: string;
 

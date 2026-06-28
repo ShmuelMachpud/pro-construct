@@ -23,6 +23,8 @@ const getAccessTokenService = async (): Promise<string> => {
 
     return cachedToken!;
   } catch (error) {
+    cachedToken = null;
+    tokenExpiry = null;
     return Promise.reject(error);
   }
 };

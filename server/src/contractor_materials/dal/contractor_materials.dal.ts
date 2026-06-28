@@ -7,8 +7,11 @@ import {
 
 const repository = AppDataSource.getRepository(ContractorMaterial);
 
+const WITH_MATERIAL = { relations: { globalMaterial: { category: true } } };
+
 export const findAllContractorMaterialsDal = async (contractorId: string) => {
   return await repository.find({
+    ...WITH_MATERIAL,
     where: { contractorId },
     order: { createdAt: "DESC" },
   });
@@ -18,7 +21,7 @@ export const findContractorMaterialByIdDal = async (
   id: number,
   contractorId: string,
 ) => {
-  return await repository.findOne({ where: { id, contractorId } });
+  return await repository.findOne({ ...WITH_MATERIAL, where: { id, contractorId } });
 };
 
 export const findContractorMaterialByGlobalIdDal = async (
@@ -34,7 +37,7 @@ export const insertContractorMaterialDal = async (
 ) => {
   const item = repository.create({ contractorId, ...dto });
   const saved = await repository.save(item);
-  return await repository.findOne({ where: { id: saved.id } });
+  return await repository.findOne({ ...WITH_MATERIAL, where: { id: saved.id } });
 };
 
 export const updateContractorMaterialByIdDal = async (
@@ -43,7 +46,7 @@ export const updateContractorMaterialByIdDal = async (
   dto: UpdateContractorMaterialDto,
 ) => {
   await repository.update({ id, contractorId }, dto);
-  return await repository.findOne({ where: { id, contractorId } });
+  return await repository.findOne({ ...WITH_MATERIAL, where: { id, contractorId } });
 };
 
 export const deleteContractorMaterialDal = async (

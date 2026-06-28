@@ -30,12 +30,3 @@ export const insertUserDal = async (data: CreateUserDto) => {
   return await repository.save(item);
 };
 
-// export const updateUserByIdDal = async (id: string, data: Partial<User>) => {
-//   await repository.update(id, data);
-//   return await repository.findOne({ where: { id } });
-// };
-
-// export const deleteUserDal = async (id: string) => {
-//   const result = await repository.delete(id);
-//   return (result.affected ?? 0) > 0;
-// };

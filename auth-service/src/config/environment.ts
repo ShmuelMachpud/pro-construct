@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const ENV = {
+  NODE_ENV: process.env.NODE_ENV || "prodaction",
   PORT: Number(process.env.PORT) || 3001,
   DB_URL: process.env.DB_URL || "",
   JWT_SECRET: process.env.JWT_SECRET || "",

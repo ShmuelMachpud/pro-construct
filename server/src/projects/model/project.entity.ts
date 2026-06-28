@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from "typeorm";
 import { ProjectType, ProjectStatus } from "../types/projects.types";
 
@@ -12,6 +13,7 @@ export class Project {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
+  @Index()
   @Column({ type: "uuid" })
   clientId: string;
 

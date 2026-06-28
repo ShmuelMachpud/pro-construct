@@ -12,7 +12,15 @@ import { QuoteItem } from "../quote_items/model/quote_item.entity";
 export const AppDataSource = new DataSource({
   type: "postgres",
   url: ENV.DB_URL,
-  synchronize: true,
+  synchronize: process.env.NODE_ENV === "development",
   logging: false,
-  entities: [Client, Project, MaterialCategory, GlobalMaterial, ContractorMaterial, PriceQuote, QuoteItem],
+  entities: [
+    Client,
+    Project,
+    MaterialCategory,
+    GlobalMaterial,
+    ContractorMaterial,
+    PriceQuote,
+    QuoteItem,
+  ],
 });

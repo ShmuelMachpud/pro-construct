@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from "typeorm";
 import { ClientType } from "../types/clients.types";
 
@@ -12,6 +13,7 @@ export class Client {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
+  @Index()
   @Column({ type: "uuid"})
   contractorId: string;
 

@@ -7,19 +7,22 @@ import {
 
 const repository = AppDataSource.getRepository(GlobalMaterial);
 
+const WITH_CATEGORY = { relations: { category: true } };
+
 export const findAllGlobalMaterialsDal = async () => {
-  return await repository.find({ order: { name: "ASC" } });
+  return await repository.find({ ...WITH_CATEGORY, order: { name: "ASC" } });
 };
 
 export const findGlobalMaterialsByCategoryDal = async (categoryId: number) => {
   return await repository.find({
+    ...WITH_CATEGORY,
     where: { categoryId },
     order: { name: "ASC" },
   });
 };
 
 export const findGlobalMaterialByIdDal = async (id: number) => {
-  return await repository.findOne({ where: { id } });
+  return await repository.findOne({ ...WITH_CATEGORY, where: { id } });
 };
 
 export const insertGlobalMaterialDal = async (
@@ -27,7 +30,7 @@ export const insertGlobalMaterialDal = async (
 ) => {
   const item = repository.create(data);
   const saved = await repository.save(item);
-  return await repository.findOne({ where: { id: saved.id } });
+  return await repository.findOne({ ...WITH_CATEGORY, where: { id: saved.id } });
 };
 
 export const updateGlobalMaterialByIdDal = async (
@@ -35,7 +38,7 @@ export const updateGlobalMaterialByIdDal = async (
   data: UpdateGlobalMaterialDto,
 ) => {
   await repository.update(id, data);
-  return await repository.findOne({ where: { id } });
+  return await repository.findOne({ ...WITH_CATEGORY, where: { id } });
 };
 
 export const deleteGlobalMaterialDal = async (id: number) => {

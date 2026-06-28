@@ -20,7 +20,7 @@ export class GlobalMaterial {
   @Column()
   categoryId: number;
 
-  @ManyToOne(() => MaterialCategory, { eager: true, onDelete: "RESTRICT" })
+  @ManyToOne(() => MaterialCategory, { onDelete: "RESTRICT" })
   @JoinColumn({ name: "categoryId" })
   category: MaterialCategory;
 

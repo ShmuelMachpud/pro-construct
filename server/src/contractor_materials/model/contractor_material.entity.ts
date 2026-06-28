@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Unique,
+  Index,
 } from "typeorm";
 import { GlobalMaterial } from "../../global_materials/model/global_material.entity";
 
@@ -16,13 +17,14 @@ export class ContractorMaterial {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index()
   @Column({ type: "uuid" })
   contractorId: string;
 
   @Column()
   globalMaterialId: number;
 
-  @ManyToOne(() => GlobalMaterial, { eager: true, onDelete: "RESTRICT" })
+  @ManyToOne(() => GlobalMaterial, { onDelete: "RESTRICT" })
   @JoinColumn({ name: "globalMaterialId" })
   globalMaterial: GlobalMaterial;
 

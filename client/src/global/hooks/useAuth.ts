@@ -3,7 +3,7 @@ import { useMemo } from "react";
 export type UserRole = "admin" | "operator" | "contractor";
 
 interface AuthPayload {
-  id: number;
+  id: string;
   role: UserRole;
 }
 

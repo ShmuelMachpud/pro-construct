@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from "typeorm";
 import { QuoteItemType } from "../types/quote_items.types";
 
@@ -12,6 +13,7 @@ export class QuoteItem {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index()
   @Column()
   quoteId: number;
 
