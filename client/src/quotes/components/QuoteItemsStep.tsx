@@ -3,6 +3,7 @@ import type { UseQuoteItemFormReturn } from "../hooks/useQuoteItemForm";
 import type { ContractorMaterial } from "../../materials/types/materials.types";
 import type { QuoteItemType } from "../types/quotes.types";
 import { formatCurrency, quoteItemTypeLabel } from "../helpers/quotes.helpers";
+import { isSourceRequired } from "../helpers/quoteItem.helpers";
 
 interface AddedItem { tempId: number; description: string; quantity: number; unitPrice: number }
 
@@ -50,7 +51,7 @@ export const QuoteItemsStep = ({ itemForm, contractorMaterials, addedItems, item
           </ToggleButtonGroup>
         </Grid>
 
-        {values.type === "MATERIAL" && (
+        {isSourceRequired(values.type) && (
           <Grid size={{ xs: 12 }}>
             <TextField select label="חומר *" fullWidth value={values.contractorMaterialId}
               onChange={(e) => handleMaterialSelect(e.target.value)}

@@ -1,6 +1,9 @@
 import Joi from "joi";
 import type { QuoteItemType } from "../types/quotes.types";
 
+export const isSourceRequired = (type: string): boolean =>
+  type === "MATERIAL";
+
 export type QuoteItemFormType = {
   type: string;
   contractorMaterialId: string;

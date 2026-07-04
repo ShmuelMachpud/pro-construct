@@ -1,5 +1,5 @@
 import { useForm } from "../../global/hooks/useForm";
-import { quoteItemInitialData, quoteItemSchema, toQuoteItemType, type QuoteItemFormType } from "../helpers/quoteItem.helpers";
+import { quoteItemInitialData, quoteItemSchema, toQuoteItemType, isSourceRequired, type QuoteItemFormType } from "../helpers/quoteItem.helpers";
 import type { ContractorMaterial } from "../../materials/types/materials.types";
 import type { CreateQuoteItemDto, QuoteItemType } from "../types/quotes.types";
 
@@ -26,7 +26,7 @@ export const useQuoteItemForm = (contractorMaterials: ContractorMaterial[]) => {
 
   const buildDto = (): CreateQuoteItemDto => ({
     type: toQuoteItemType(values.type),
-    sourceId: values.type === "MATERIAL" ? Number(values.contractorMaterialId) : undefined,
+    sourceId: isSourceRequired(values.type) ? Number(values.contractorMaterialId) : undefined,
     description: values.description.trim(),
     quantity: parseFloat(values.quantity),
     unitPrice: parseFloat(values.unitPrice),

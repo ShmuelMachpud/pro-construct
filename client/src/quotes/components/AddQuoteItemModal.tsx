@@ -8,6 +8,7 @@ import { useQuoteItemForm } from "../hooks/useQuoteItemForm";
 import type { ContractorMaterial } from "../../materials/types/materials.types";
 import type { CreateQuoteItemDto, QuoteItemType } from "../types/quotes.types";
 import { formatCurrency, quoteItemTypeLabel } from "../helpers/quotes.helpers";
+import { isSourceRequired } from "../helpers/quoteItem.helpers";
 
 interface Props {
   open: boolean;
@@ -68,7 +69,7 @@ export const AddQuoteItemModal = ({ open, onClose, onSave, contractorMaterials }
             </ToggleButtonGroup>
           </Grid>
 
-          {values.type === "MATERIAL" && (
+          {isSourceRequired(values.type) && (
             <Grid size={{ xs: 12 }}>
               <TextField
                 select

@@ -8,7 +8,7 @@ import {
   updateQuoteItemByIdDal,
   deleteQuoteItemDal,
 } from "../dal/quote_items.dal";
-import { requiresSourceId } from "../helpers/quote_items.helpers";
+import { requiresSourceId, isValidQuantity, isValidUnitPrice } from "../helpers/quote_items.helpers";
 import { CreateQuoteItemDto, UpdateQuoteItemDto } from "../types/quote_items.types";
 
 export const getAllQuoteItemsService = async (
@@ -50,6 +50,10 @@ export const addQuoteItemService = async (
     await getPriceQuoteByIdService(quoteId, projectId, contractorId);
     if (requiresSourceId(dto.type) && !dto.sourceId)
       throw new CustomError(`sourceId is required for type ${dto.type}`, 400);
+    if (!isValidQuantity(dto.quantity))
+      throw new CustomError("Quantity must be greater than 0", 400);
+    if (!isValidUnitPrice(dto.unitPrice))
+      throw new CustomError("Unit price must not be negative", 400);
     const item = await insertQuoteItemDal(quoteId, dto);
     regenerateQuotePdf(quoteId, projectId);
     return item;
@@ -67,6 +71,10 @@ export const updateQuoteItemService = async (
 ) => {
   try {
     await getPriceQuoteByIdService(quoteId, projectId, contractorId);
+    if (dto.quantity !== undefined && !isValidQuantity(dto.quantity))
+      throw new CustomError("Quantity must be greater than 0", 400);
+    if (dto.unitPrice !== undefined && !isValidUnitPrice(dto.unitPrice))
+      throw new CustomError("Unit price must not be negative", 400);
     const item = await updateQuoteItemByIdDal(id, quoteId, dto);
     if (!item) throw new CustomError("Quote item not found", 404);
     regenerateQuotePdf(quoteId, projectId);
