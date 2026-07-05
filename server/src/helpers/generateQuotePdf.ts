@@ -16,24 +16,34 @@ const formatCurrency = (n: number) =>
 const formatDate = (d: Date | string | null) =>
   d ? new Date(d).toLocaleDateString("he-IL") : "-";
 
-const buildHtml = (quote: PriceQuote, items: QuoteItem[], projectName: string): string => {
+// Builds an RTL Hebrew HTML document for the quote. The grand total is
+// recalculated server-side from the raw items - the client is never
+// trusted with the final amounts that appear on the official document.
+const buildHtml = (
+  quote: PriceQuote,
+  items: QuoteItem[],
+  projectName: string,
+): string => {
   const grandTotal = items.reduce(
     (sum, item) => sum + Number(item.quantity) * Number(item.unitPrice),
     0,
   );
 
-  const itemRows = items.length === 0
-    ? `<tr><td colspan="4" class="empty">אין פריטים</td></tr>`
-    : items.map((item) => {
-        const lineTotal = Number(item.quantity) * Number(item.unitPrice);
-        return `
+  const itemRows =
+    items.length === 0
+      ? `<tr><td colspan="4" class="empty">אין פריטים</td></tr>`
+      : items
+          .map((item) => {
+            const lineTotal = Number(item.quantity) * Number(item.unitPrice);
+            return `
           <tr>
             <td>${item.description}</td>
             <td>${Number(item.quantity)}</td>
             <td>${formatCurrency(Number(item.unitPrice))}</td>
             <td>${formatCurrency(lineTotal)}</td>
           </tr>`;
-      }).join("");
+          })
+          .join("");
 
   return `
     <!DOCTYPE html>
@@ -139,15 +149,21 @@ const buildHtml = (quote: PriceQuote, items: QuoteItem[], projectName: string): 
         סה"כ לתשלום: <span>${formatCurrency(grandTotal)}</span>
       </div>
 
-      ${quote.notes ? `
+      ${
+        quote.notes
+          ? `
         <div class="notes">
           <div class="notes-label">הערות:</div>
           <div>${quote.notes}</div>
-        </div>` : ""}
+        </div>`
+          : ""
+      }
     </body>
     </html>`;
 };
 
+// Converts the HTML into an A4 PDF using a headless Chromium instance.
+// The browser is always closed in "finally" to prevent process leaks.
 export const generateQuotePdf = async (
   quote: PriceQuote,
   items: QuoteItem[],
@@ -159,7 +175,9 @@ export const generateQuotePdf = async (
   });
   try {
     const page = await browser.newPage();
-    await page.setContent(buildHtml(quote, items, projectName), { waitUntil: "load" });
+    await page.setContent(buildHtml(quote, items, projectName), {
+      waitUntil: "load",
+    });
     const pdf = await page.pdf({ format: "A4", printBackground: true });
     return Buffer.from(pdf);
   } finally {

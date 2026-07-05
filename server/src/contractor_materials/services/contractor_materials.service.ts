@@ -36,11 +36,16 @@ export const getContractorMaterialByIdService = async (
   }
 };
 
+// Adds a global-catalog material to the contractor's personal price list.
 export const addContractorMaterialService = async (
-  contractorId: string,
+  contractorId: string, // taken from the JWT, never from the request body
   dto: AddContractorMaterialDto,
 ) => {
   try {
+    // Application-level duplicate check: each contractor may adopt
+    // a given global material only once (returns 409 Conflict).
+    // The DB UNIQUE(contractorId, globalMaterialId) constraint is the
+    // second line of defense against race conditions
     const existing = await findContractorMaterialByGlobalIdDal(
       dto.globalMaterialId,
       contractorId,

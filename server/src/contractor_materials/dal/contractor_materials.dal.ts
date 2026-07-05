@@ -7,28 +7,17 @@ import {
 
 const repository = AppDataSource.getRepository(ContractorMaterial);
 
+// Every read eager-loads the linked global material AND its category,
+// so the client receives one self-contained object per row
+// (contractor price + global name/unit + category name) in a single query
 const WITH_MATERIAL = { relations: { globalMaterial: { category: true } } };
 
 export const findAllContractorMaterialsDal = async (contractorId: string) => {
   return await repository.find({
     ...WITH_MATERIAL,
-    where: { contractorId },
+    where: { contractorId }, // hard scoping - only this contractor's rows
     order: { createdAt: "DESC" },
   });
-};
-
-export const findContractorMaterialByIdDal = async (
-  id: number,
-  contractorId: string,
-) => {
-  return await repository.findOne({ ...WITH_MATERIAL, where: { id, contractorId } });
-};
-
-export const findContractorMaterialByGlobalIdDal = async (
-  globalMaterialId: number,
-  contractorId: string,
-) => {
-  return await repository.findOne({ where: { globalMaterialId, contractorId } });
 };
 
 export const insertContractorMaterialDal = async (
@@ -37,7 +26,31 @@ export const insertContractorMaterialDal = async (
 ) => {
   const item = repository.create({ contractorId, ...dto });
   const saved = await repository.save(item);
-  return await repository.findOne({ ...WITH_MATERIAL, where: { id: saved.id } });
+
+  // Re-fetch with relations so the API response includes the joined data
+  return await repository.findOne({
+    ...WITH_MATERIAL,
+    where: { id: saved.id },
+  });
+};
+
+export const findContractorMaterialByIdDal = async (
+  id: number,
+  contractorId: string,
+) => {
+  return await repository.findOne({
+    ...WITH_MATERIAL,
+    where: { id, contractorId },
+  });
+};
+
+export const findContractorMaterialByGlobalIdDal = async (
+  globalMaterialId: number,
+  contractorId: string,
+) => {
+  return await repository.findOne({
+    where: { globalMaterialId, contractorId },
+  });
 };
 
 export const updateContractorMaterialByIdDal = async (
@@ -46,7 +59,10 @@ export const updateContractorMaterialByIdDal = async (
   dto: UpdateContractorMaterialDto,
 ) => {
   await repository.update({ id, contractorId }, dto);
-  return await repository.findOne({ ...WITH_MATERIAL, where: { id, contractorId } });
+  return await repository.findOne({
+    ...WITH_MATERIAL,
+    where: { id, contractorId },
+  });
 };
 
 export const deleteContractorMaterialDal = async (

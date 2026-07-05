@@ -8,8 +8,15 @@ import {
   updateQuoteItemByIdDal,
   deleteQuoteItemDal,
 } from "../dal/quote_items.dal";
-import { requiresSourceId, isValidQuantity, isValidUnitPrice } from "../helpers/quote_items.helpers";
-import { CreateQuoteItemDto, UpdateQuoteItemDto } from "../types/quote_items.types";
+import {
+  requiresSourceId,
+  isValidQuantity,
+  isValidUnitPrice,
+} from "../helpers/quote_items.helpers";
+import {
+  CreateQuoteItemDto,
+  UpdateQuoteItemDto,
+} from "../types/quote_items.types";
 
 export const getAllQuoteItemsService = async (
   quoteId: number,
@@ -40,6 +47,8 @@ export const getQuoteItemByIdService = async (
   }
 };
 
+// Adds a new item to a quote. The flow enforces three layers of protection
+// before any data is written, then triggers PDF regeneration.
 export const addQuoteItemService = async (
   quoteId: number,
   projectId: string,
@@ -47,13 +56,22 @@ export const addQuoteItemService = async (
   dto: CreateQuoteItemDto,
 ) => {
   try {
+    // 1. Ownership check: verifies the quote belongs to a project owned
+    //    by the authenticated contractor (throws 404 otherwise)
     await getPriceQuoteByIdService(quoteId, projectId, contractorId);
+
+    // 2. Business validation: MATERIAL items must link to a real
+    //    material from the contractor's price list
     if (requiresSourceId(dto.type) && !dto.sourceId)
       throw new CustomError(`sourceId is required for type ${dto.type}`, 400);
     if (!isValidQuantity(dto.quantity))
       throw new CustomError("Quantity must be greater than 0", 400);
     if (!isValidUnitPrice(dto.unitPrice))
       throw new CustomError("Unit price must not be negative", 400);
+
+    // 3. Persist the item, then regenerate the quote PDF asynchronously.
+    //    Note: regenerateQuotePdf is intentionally NOT awaited - the API
+    //    responds immediately while the PDF is rebuilt in the background
     const item = await insertQuoteItemDal(quoteId, dto);
     regenerateQuotePdf(quoteId, projectId);
     return item;
