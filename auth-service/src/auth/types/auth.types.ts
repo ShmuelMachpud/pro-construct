@@ -9,7 +9,8 @@ export interface RegisterDto {
   companyName?: string;
   companyId?: string;
   address?: string;
-  mockCardNumber: string;
+  // PayPal subscription id, received after the user approved the payment
+  subscriptionId: string;
 }
 
 export interface LoginDto {

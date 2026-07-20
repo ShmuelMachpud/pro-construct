@@ -10,8 +10,6 @@ export const register = async (
   values: RegisterFormType,
   plan: RegisterPlan,
   subscriptionId: string,
-
-  // cardNumber: string,
 ) => {
   const response = await axiosInstance.post("/auth/register", {
     name: values.name,
@@ -22,8 +20,13 @@ export const register = async (
     companyName: values.companyName || undefined,
     companyId: values.companyId || undefined,
     address: values.address || undefined,
-    mockCardNumber: subscriptionId,
-    // mockCardNumber: cardNumber,
+    subscriptionId,
   });
   return response.data;
+};
+
+// Pre-payment check so the user never pays for an email that is already taken
+export const checkEmailAvailable = async (email: string): Promise<boolean> => {
+  const response = await axiosInstance.post("/auth/check-email", { email });
+  return response.data.available;
 };
