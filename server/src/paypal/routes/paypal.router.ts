@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { authenticate } from "../../middleware/auth.middleware";
 import { createSubscriptionController } from "../controllers/paypal.controller";
 
 export const paypalRouter = Router();
 
-paypalRouter.post("/create-subscription", authenticate, createSubscriptionController);
+// Public route: subscriptions are created during registration,
+// before the user has an account or a JWT
+paypalRouter.post("/create-subscription", createSubscriptionController);
