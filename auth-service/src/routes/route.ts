@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { handleError } from "../utils/handleError";
 import { CustomError } from "../utils/customError";
-import { authRouter } from "../auth/routes/auth.router";
-import { usersRouter } from "../users/routes/users.router";
+import { authRouter } from "../auth/routes/auth.route";
+import { usersRouter } from "../users/routes/users.route";
 
 export const router = Router();
 

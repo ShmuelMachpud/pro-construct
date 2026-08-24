@@ -13,7 +13,7 @@ const app = express();
 app.use(corsMiddleware);
 app.use(requestLogger);
 app.use(express.json());
-app.use("/api", router);
+app.use("/", router);
 
 AppDataSource.initialize()
   .then(() => {
