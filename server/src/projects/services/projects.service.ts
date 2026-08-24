@@ -10,6 +10,7 @@ import {
   updateProjectByIdDal,
   deleteProjectDal,
 } from "../dal/projects.dal";
+import { validateCreateProjectDto } from "../helpers/projects.helpers";
 
 export const getAllProjectsService = async () => {
   try {
@@ -60,7 +61,8 @@ export const getProjectByIdAndContractorService = async (
 
 export const createProjectService = async (dto: CreateProjectDto) => {
   try {
-    return await insertProjectDal(dto);
+    const validatedDto = validateCreateProjectDto(dto);
+    return await insertProjectDal(validatedDto);
   } catch (error) {
     return Promise.reject(error);
   }
