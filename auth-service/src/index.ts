@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import express from "express";
 import { corsMiddleware } from "./middleware/cors.middleware";
-import { router } from "./routes";
+import { router } from "./routes/route";
 import { AppDataSource } from "./config/database";
 import { logger } from "./utils/logger";
 import { ENV } from "./config/environment";
