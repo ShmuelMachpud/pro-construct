@@ -26,8 +26,18 @@ const statusColor: Record<string, string> = {
 export const contractorsColumns: ColumnDef<UserInterface>[] = [
   { key: "name", label: "שם" },
   { key: "email", label: "אימייל" },
-  { key: "companyName", label: "חברה", render: (row) => row.companyName ?? "—" },
-  { key: "isApproved", label: "סטטוס", render: (row) => <ApprovalChip isApproved={row.isApproved} /> },
+  {
+    key: "companyName",
+    label: "חברה",
+    render: (row) => row.companyName ?? "—",
+    getFilterValue: (row) => row.companyName ?? "—",
+  },
+  {
+    key: "isApproved",
+    label: "סטטוס",
+    render: (row) => <ApprovalChip isApproved={row.isApproved} />,
+    getFilterValue: (row) => (row.isApproved ? "מאושר" : "ממתין"),
+  },
   {
     key: "subscriptionStatus",
     label: "מנוי",
@@ -44,8 +54,14 @@ export const contractorsColumns: ColumnDef<UserInterface>[] = [
       ) : (
         <Typography variant="caption" color="grey.600">—</Typography>
       ),
+    getFilterValue: (row) => (row.subscriptionStatus ? subscriptionLabel[row.subscriptionStatus] : "—"),
   },
-  { key: "createdAt", label: "הרשמה", render: (row) => formatDate(row.createdAt) },
+  {
+    key: "createdAt",
+    label: "הרשמה",
+    render: (row) => formatDate(row.createdAt),
+    getFilterValue: (row) => formatDate(row.createdAt),
+  },
 ];
 
 export const projectsColumns: ColumnDef<Project>[] = [
@@ -64,7 +80,18 @@ export const projectsColumns: ColumnDef<Project>[] = [
         }}
       />
     ),
+    getFilterValue: (row) => statusLabel[row.status] ?? row.status,
   },
-  { key: "startDate", label: "התחלה", render: (row) => row.startDate ? formatDate(row.startDate) : "—" },
-  { key: "createdAt", label: "נוצר", render: (row) => formatDate(row.createdAt) },
+  {
+    key: "startDate",
+    label: "התחלה",
+    render: (row) => row.startDate ? formatDate(row.startDate) : "—",
+    getFilterValue: (row) => (row.startDate ? formatDate(row.startDate) : "—"),
+  },
+  {
+    key: "createdAt",
+    label: "נוצר",
+    render: (row) => formatDate(row.createdAt),
+    getFilterValue: (row) => formatDate(row.createdAt),
+  },
 ];

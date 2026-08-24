@@ -42,7 +42,12 @@ export const getCategoryColumns = (
 ): ColumnDef<MaterialCategory>[] => {
   const base: ColumnDef<MaterialCategory>[] = [
     { key: "name", label: "שם קטגוריה" },
-    { key: "description", label: "תיאור", render: (row) => row.description ?? "—" },
+    {
+      key: "description",
+      label: "תיאור",
+      render: (row) => row.description ?? "—",
+      getFilterValue: (row) => row.description ?? "—",
+    },
   ];
   if (!canEdit) return base;
   return [...base, {
@@ -59,9 +64,19 @@ export const getGlobalMaterialColumns = (
 ): ColumnDef<GlobalMaterial>[] => {
   const base: ColumnDef<GlobalMaterial>[] = [
     { key: "name", label: "שם חומר" },
-    { key: "category", label: "קטגוריה", render: (row) => row.category.name },
+    {
+      key: "category",
+      label: "קטגוריה",
+      render: (row) => row.category.name,
+      getFilterValue: (row) => row.category.name,
+    },
     { key: "unit", label: "יחידת מידה" },
-    { key: "description", label: "תיאור", render: (row) => row.description ?? "—" },
+    {
+      key: "description",
+      label: "תיאור",
+      render: (row) => row.description ?? "—",
+      getFilterValue: (row) => row.description ?? "—",
+    },
   ];
   if (!canEdit) return base;
   return [...base, {
@@ -75,9 +90,24 @@ export const getContractorMaterialColumns = (
   onEdit: (row: ContractorMaterial) => void,
   onDelete: (row: ContractorMaterial) => void,
 ): ColumnDef<ContractorMaterial>[] => [
-  { key: "globalMaterial", label: "שם חומר", render: (row) => row.globalMaterial.name },
-  { key: "globalMaterial", label: "קטגוריה", render: (row) => row.globalMaterial.category.name },
-  { key: "globalMaterial", label: "יחידת מידה", render: (row) => row.globalMaterial.unit },
+  {
+    key: "globalMaterial",
+    label: "שם חומר",
+    render: (row) => row.globalMaterial.name,
+    getFilterValue: (row) => row.globalMaterial.name,
+  },
+  {
+    key: "globalMaterial",
+    label: "קטגוריה",
+    render: (row) => row.globalMaterial.category.name,
+    getFilterValue: (row) => row.globalMaterial.category.name,
+  },
+  {
+    key: "globalMaterial",
+    label: "יחידת מידה",
+    render: (row) => row.globalMaterial.unit,
+    getFilterValue: (row) => row.globalMaterial.unit,
+  },
   {
     key: "price",
     label: "מחיר",
@@ -89,18 +119,21 @@ export const getContractorMaterialColumns = (
       ) : (
         <Typography color="grey.600" fontSize="0.875rem">—</Typography>
       ),
+    getFilterValue: (row) => (row.price != null ? `₪${Number(row.price).toFixed(2)}` : "—"),
   },
   {
     key: "supplier",
     label: "ספק",
     render: (row) =>
       row.supplier ?? <Typography color="grey.600" fontSize="0.875rem">—</Typography>,
+    getFilterValue: (row) => row.supplier ?? "—",
   },
   {
     key: "notes",
     label: "הערות",
     render: (row) =>
       row.notes ?? <Typography color="grey.600" fontSize="0.875rem">—</Typography>,
+    getFilterValue: (row) => row.notes ?? "—",
   },
   {
     key: "id",

@@ -108,6 +108,7 @@ const QuoteDetailPage = () => {
         loading={loading}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
+        contractorMaterials={contractorMaterials}
       />
 
       {items.length > 0 && (
