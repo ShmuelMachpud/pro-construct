@@ -24,7 +24,7 @@ const CustomerPage = () => {
     <Box>
       {/* Header */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/clients")} sx={{ color: "grey.400" }}>
+        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/customers")} sx={{ color: "grey.400" }}>
           לקוחות
         </Button>
         {customer.type === "business"
