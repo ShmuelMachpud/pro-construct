@@ -76,6 +76,7 @@ const MyMaterialsPage = () => {
         onClose={() => setAddOpen(false)}
         onSave={handleAdd}
         globalMaterials={globalMaterials}
+        contractorMaterials={materials}
         categories={categories}
       />
 

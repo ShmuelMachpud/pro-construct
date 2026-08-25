@@ -5,17 +5,18 @@ import {
 } from "@mui/material";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import { useAddContractorMaterial } from "../hooks/useAddContractorMaterial";
-import type { GlobalMaterial, MaterialCategory, AddContractorMaterialDto } from "../types/materials.types";
+import type { GlobalMaterial, MaterialCategory, ContractorMaterial, AddContractorMaterialDto } from "../types/materials.types";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   onSave: (dto: AddContractorMaterialDto) => Promise<void>;
   globalMaterials: GlobalMaterial[];
+  contractorMaterials: ContractorMaterial[];
   categories: MaterialCategory[];
 }
 
-export const AddContractorMaterialModal = ({ open, onClose, onSave, globalMaterials, categories }: Props) => {
+export const AddContractorMaterialModal = ({ open, onClose, onSave, globalMaterials, contractorMaterials, categories }: Props) => {
   const { values, setValue, errors, onBlur, isValid, loading, serverError, handleSubmit, handleClose } =
     useAddContractorMaterial(onSave, onClose);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number>(0);
@@ -24,9 +25,11 @@ export const AddContractorMaterialModal = ({ open, onClose, onSave, globalMateri
     if (!open) setSelectedCategoryId(0);
   }, [open]);
 
+  const addedGlobalMaterialIds = new Set(contractorMaterials.map((cm) => cm.globalMaterialId));
+  const availableMaterials = globalMaterials.filter((m) => !addedGlobalMaterialIds.has(m.id));
   const filteredMaterials = selectedCategoryId
-    ? globalMaterials.filter((m) => m.categoryId === selectedCategoryId)
-    : globalMaterials;
+    ? availableMaterials.filter((m) => m.categoryId === selectedCategoryId)
+    : availableMaterials;
 
   const handleCategoryFilter = (categoryId: number) => {
     setSelectedCategoryId(categoryId);
