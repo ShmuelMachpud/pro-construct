@@ -13,8 +13,18 @@ const ApprovalChip = ({ isApproved }: { isApproved: boolean }) =>
 export const allUsersColumns: ColumnDef<UserInterface>[] = [
   { key: "name", label: "שם" },
   { key: "email", label: "אימייל" },
-  { key: "role", label: "תפקיד", render: (row) => roleLabel[row.role] ?? row.role },
-  { key: "isApproved", label: "אישור", render: (row) => <ApprovalChip isApproved={row.isApproved} /> },
+  {
+    key: "role",
+    label: "תפקיד",
+    render: (row) => roleLabel[row.role] ?? row.role,
+    getFilterValue: (row) => roleLabel[row.role] ?? row.role,
+  },
+  {
+    key: "isApproved",
+    label: "אישור",
+    render: (row) => <ApprovalChip isApproved={row.isApproved} />,
+    getFilterValue: (row) => (row.isApproved ? "מאושר" : "ממתין"),
+  },
   {
     key: "subscriptionStatus",
     label: "מנוי",
@@ -31,14 +41,25 @@ export const allUsersColumns: ColumnDef<UserInterface>[] = [
       ) : (
         <Typography variant="caption" color="grey.600">—</Typography>
       ),
+    getFilterValue: (row) => (row.subscriptionStatus ? subscriptionLabel[row.subscriptionStatus] : "—"),
   },
-  { key: "createdAt", label: "הרשמה", render: (row) => formatDate(row.createdAt) },
+  {
+    key: "createdAt",
+    label: "הרשמה",
+    render: (row) => formatDate(row.createdAt),
+    getFilterValue: (row) => formatDate(row.createdAt),
+  },
 ];
 
 export const pendingUsersColumns: ColumnDef<UserInterface>[] = [
   { key: "name", label: "שם" },
   { key: "email", label: "אימייל" },
-  { key: "companyName", label: "חברה", render: (row) => row.companyName ?? "—" },
+  {
+    key: "companyName",
+    label: "חברה",
+    render: (row) => row.companyName ?? "—",
+    getFilterValue: (row) => row.companyName ?? "—",
+  },
   {
     key: "paymentToken",
     label: "כרטיס",
@@ -48,6 +69,12 @@ export const pendingUsersColumns: ColumnDef<UserInterface>[] = [
       ) : (
         <Typography variant="caption" color="grey.600">אין</Typography>
       ),
+    getFilterValue: (row) => (row.paymentToken ? "קיים" : "אין"),
   },
-  { key: "createdAt", label: "הרשמה", render: (row) => formatDate(row.createdAt) },
+  {
+    key: "createdAt",
+    label: "הרשמה",
+    render: (row) => formatDate(row.createdAt),
+    getFilterValue: (row) => formatDate(row.createdAt),
+  },
 ];

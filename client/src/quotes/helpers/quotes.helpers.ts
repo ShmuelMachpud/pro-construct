@@ -1,4 +1,7 @@
 import type { QuoteItem, QuoteStatus } from "../types/quotes.types";
+import type { ContractorMaterial } from "../../materials/types/materials.types";
+
+export const NO_CATEGORY_LABEL = "—";
 
 export const quoteStatusConfig: Record<
   QuoteStatus,
@@ -33,3 +36,14 @@ export const calcGrandTotal = (items: QuoteItem[]): number =>
 // using the he-IL locale (e.g. 12345.5 -> "₪12,345.50")
 export const formatCurrency = (amount: number): string =>
   `₪${amount.toLocaleString("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+// A quote item only stores a sourceId; the category lives on the
+// contractor material it was created from, so it's resolved by lookup.
+export const getItemCategory = (
+  item: QuoteItem,
+  contractorMaterials: ContractorMaterial[],
+): string => {
+  if (item.type !== "MATERIAL" || item.sourceId == null) return NO_CATEGORY_LABEL;
+  const material = contractorMaterials.find((m) => m.id === item.sourceId);
+  return material?.globalMaterial.category.name ?? NO_CATEGORY_LABEL;
+};

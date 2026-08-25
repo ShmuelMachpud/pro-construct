@@ -31,9 +31,10 @@ export const createProjectInitialData: CreateProjectFormType = {
 };
 
 export const createProjectSchema = Joi.object<CreateProjectFormType>({
-  name: Joi.string().required().messages({
+  name: Joi.string().min(2).required().messages({
     "string.empty": "שם פרויקט הוא שדה חובה",
     "any.required": "שם פרויקט הוא שדה חובה",
+    "string.min": "שם פרויקט חייב להכיל לפחות 2 תווים"
   }),
   type: Joi.string().valid("construction", "renovation").required().messages({
     "any.only": "סוג פרויקט לא תקין",

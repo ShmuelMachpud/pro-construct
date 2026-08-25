@@ -132,7 +132,7 @@ export const AddQuoteItemModal = ({ open, onClose, onSave, contractorMaterials }
               label="כמות *"
               fullWidth
               type="number"
-              inputProps={{ min: 0.001, step: 0.001 }}
+              inputProps={{ min: 1, step: 1 }}
               value={values.quantity}
               onChange={(e) => setValue("quantity", e.target.value)}
               onBlur={() => onBlur("quantity")}
