@@ -36,7 +36,8 @@ const Sidebar = () => {
       sx={{
         width: DRAWER_WIDTH,
         minWidth: DRAWER_WIDTH,
-        minHeight: "100vh",
+        height: "100%",
+        overflowY: "auto",
         backgroundColor: "#1A1A1A",
         borderLeft: "1px solid rgba(255,107,0,0.2)",
         display: "flex",

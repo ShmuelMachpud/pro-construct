@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Box, Typography, IconButton } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import type { ReactNode, MouseEvent } from "react";
 import { useTableFilters, isColumnFilterable } from "../hooks/useTableFilters";
 import { ColumnFilterMenu } from "./ColumnFilterMenu";
+
+const MIN_TABLE_HEIGHT = 240;
+const BOTTOM_SPACING = 24;
 
 export interface ColumnDef<T> {
   key: keyof T;
@@ -31,6 +34,20 @@ const GenericTable = <T extends object>({ columns, rows, loading, emptyMessage =
     useTableFilters(columns, rows);
   const [openColIndex, setOpenColIndex] = useState<number | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const tableContainerRef = useRef<HTMLDivElement | null>(null);
+  const [tableMaxHeight, setTableMaxHeight] = useState<number>(MIN_TABLE_HEIGHT);
+
+  useLayoutEffect(() => {
+    const updateTableMaxHeight = () => {
+      if (!tableContainerRef.current) return;
+      const { top } = tableContainerRef.current.getBoundingClientRect();
+      setTableMaxHeight(Math.max(window.innerHeight - top - BOTTOM_SPACING, MIN_TABLE_HEIGHT));
+    };
+
+    updateTableMaxHeight();
+    window.addEventListener("resize", updateTableMaxHeight);
+    return () => window.removeEventListener("resize", updateTableMaxHeight);
+  }, [loading]);
 
   const handleFilterIconClick = (e: MouseEvent<HTMLButtonElement>, colIndex: number) => {
     e.stopPropagation();
@@ -51,14 +68,35 @@ const GenericTable = <T extends object>({ columns, rows, loading, emptyMessage =
   }
 
   return (
-    <TableContainer component={Paper} sx={{ backgroundColor: "#1A1A1A", border: "1px solid rgba(255,107,0,0.2)", borderRadius: 2 }}>
-      <Table>
+    <TableContainer
+      ref={tableContainerRef}
+      component={Paper}
+      sx={{
+        maxHeight: tableMaxHeight,
+        overflow: "auto",
+        backgroundColor: "#1A1A1A",
+        border: "1px solid rgba(255,107,0,0.2)",
+        borderRadius: 2,
+        scrollbarWidth: "thin",
+        scrollbarColor: "rgba(255,107,0,0.35) transparent",
+        "&::-webkit-scrollbar": { width: 8, height: 8 },
+        "&::-webkit-scrollbar-track": { backgroundColor: "transparent" },
+        "&::-webkit-scrollbar-thumb": { backgroundColor: "rgba(255,107,0,0.35)", borderRadius: 4 },
+        "&::-webkit-scrollbar-thumb:hover": { backgroundColor: "rgba(255,107,0,0.55)" },
+      }}
+    >
+      <Table stickyHeader>
         <TableHead>
           <TableRow>
             {columns.map((col, colIndex) => (
               <TableCell
                 key={colIndex}
-                sx={{ color: "#FF6B00", fontWeight: "bold", borderBottom: "1px solid rgba(255,107,0,0.2)" }}
+                sx={{
+                  color: "#FF6B00",
+                  fontWeight: "bold",
+                  backgroundColor: "#1A1A1A",
+                  borderBottom: "1px solid rgba(255,107,0,0.2)",
+                }}
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                   {col.label}
